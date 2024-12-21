@@ -1,0 +1,73 @@
+.Container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: var(--backgroundPrimary);
+}
+
+.Wrapper {
+  width: 100%;
+  max-width: 1500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.Content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.CodesWrapper {
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.itemWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scannerWrapper {
+  width: 100%;
+  height: 100%;
+  max-width: 500px;
+  position: relative;
+}
+
+/* laptopL */
+@media (min-width: 1240px) and (max-width: 1550px) {
+  .Wrapper {
+    max-width: 1230px;
+  }
+}
+/* laptopM */
+@media (min-width: 1024px) and (max-width: 1240px) {
+  .Wrapper {
+    max-width: 1230px;
+  }
+}
+
+/* Global */
+@media (min-width: 100px) and (max-width: 1024px) {
+  .Wrapper {
+    max-width: unset;
+    width: 95%;
+  }
+  .Content {
+    gap: 40px;
+  }
+}

@@ -1,0 +1,191 @@
+.Container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 0;
+  background: var(--textPrimary);
+}
+
+.Wrapper {
+  width: 100%;
+  max-width: 1500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.Content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 40px;
+}
+
+.OrderNotifier {
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: cneter;
+  padding: 0 0 25px 0;
+  position: relative;
+}
+
+.notifier_text {
+  width: 100%;
+  color: var(--textPrimary);
+  padding: 5px;
+  text-align: center;
+  background-color: var(--buttonPrimary);
+  font-size: 1.1rem;
+}
+.close_btn_wrapper {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+}
+
+.NavWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav_rightWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+}
+.nav_rightWrapper::-webkit-scrollbar {
+  height: 2px;
+}
+
+.nav_rightWrapper > span {
+  color: var(--textSecondary);
+}
+.nav_rightWrapper > a {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  color: var(--textSecondary);
+}
+
+.nav_rightWrapper > a > span {
+  font-family: var(--font-Jost);
+  white-space: nowrap;
+}
+
+.ContentCotainer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  position: relative;
+}
+
+.Grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  user-select: none;
+  z-index: 2;
+}
+
+@media (min-width: 200px) and (max-width: 640px) {
+  .notifier_text {
+    padding-right: 40px;
+  }
+}
+
+@media (min-width: 200px) and (max-width: 560px) {
+  .close_btn_wrapper {
+    right: 12px;
+    top: 20px;
+  }
+}
+
+/* laptopL */
+@media (min-width: 1240px) and (max-width: 1550px) {
+  .Wrapper {
+    max-width: 1230px;
+  }
+}
+/* laptopM */
+@media (min-width: 1024px) and (max-width: 1240px) {
+  .Wrapper {
+    max-width: unset;
+  }
+  .NavWrapper {
+    width: 95%;
+  }
+}
+/* laptopS */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .nav_rightWrapper {
+    width: calc(769px - 80px);
+  }
+}
+/* tabletL */
+@media (min-width: 440px) and (max-width: 768px) {
+  .nav_rightWrapper {
+    width: calc(441px - 60px);
+  }
+}
+/* tabletS */
+@media (min-width: 350px) and (max-width: 440px) {
+  .nav_rightWrapper {
+    width: calc(351px - 30px);
+  }
+}
+/* mobileL */
+@media (min-width: 285px) and (max-width: 350px) {
+  .nav_rightWrapper {
+    width: calc(286px - 30px);
+  }
+}
+/* mobileM */
+@media (min-width: 200px) and (max-width: 285px) {
+  .nav_rightWrapper {
+    width: calc(201px - 30px);
+  }
+}
+/* mobileS */
+@media (min-width: 100px) and (max-width: 200px) {
+  .nav_rightWrapper {
+    width: calc(101px - 30px);
+  }
+}
+
+/* Global */
+@media (min-width: 100px) and (max-width: 1024px) {
+  .Wrapper {
+    max-width: unset;
+    width: 95%;
+  }
+  .NavWrapper {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+  }
+  .nav_rightWrapper {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    padding: 8px 0;
+  }
+  .Grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}

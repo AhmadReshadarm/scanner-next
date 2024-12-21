@@ -1,0 +1,55 @@
+.NavWrap {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  z-index: 1000;
+  width: 100vw;
+  min-width: 100vw;
+  min-height: 60px;
+  max-height: 60px;
+  height: 100%;
+  background-color: var(--glassmorphismBg);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+.icons_wrapper_mobile {
+  height: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  gap: 5px;
+}
+
+.ParentWrapper {
+  position: relative;
+}
+
+.Counter {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: var(--buttonPrimary);
+  color: var(--textPrimary);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+}
+
+/* Global */
+@media (min-width: 100px) and (max-width: 1024px) {
+  .NavWrap {
+    display: flex;
+  }
+}

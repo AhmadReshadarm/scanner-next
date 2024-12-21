@@ -1,0 +1,41 @@
+.colorsHeader {
+    display: flex;
+    flex-wrap: wrap;
+
+    &__title {
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 2rem;
+        margin-bottom: 20px;
+    }
+
+    &__createColorButton {
+        margin-right: 0px;
+        margin-left: auto;
+        font-size: 0.9rem;
+    }
+}
+
+
+
+.spinner {
+    display: block;
+    margin-top: 100px;
+}
+
+.createColorForm {
+    &__buttonsStack {
+        &__submitButton {
+            margin-right: 10px;
+        }
+    }
+}
+
+.createColorHeader {
+    &__title {
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 2rem;
+        margin-bottom: 20px;
+    }
+}

@@ -1,0 +1,60 @@
+.AuthContainer {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.AuthWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 1500px;
+}
+.ContainerOrders {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.no_orders {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty_orders {
+  font-size: 2rem;
+  text-align: center;
+}
+
+/* laptopL */
+@media (min-width: 1240px) and (max-width: 1550px) {
+  .AuthWrapper {
+    max-width: 1230px;
+  }
+}
+/* laptopM */
+@media (min-width: 1024px) and (max-width: 1240px) {
+  .AuthWrapper {
+    max-width: unset;
+  }
+}
+
+/* Global */
+@media (min-width: 100px) and (max-width: 1024px) {
+  .AuthWrapper {
+    max-width: unset;
+    width: 90%;
+  }
+}

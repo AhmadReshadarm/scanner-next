@@ -1,0 +1,138 @@
+.Container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: var(--backgroundSecondery);
+}
+
+.Wrapper {
+  width: 100%;
+  max-width: 1500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.Content {
+  width: 100%;
+  height: 90px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.MenuButtonWrapper {
+  z-index: 100;
+  cursor: pointer;
+}
+
+.LogoWrapper {
+  z-index: 100;
+}
+
+.IconsWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px;
+}
+
+.icons_parent_wrapper {
+  display: flex;
+  position: relative;
+  z-index: 100;
+  cursor: pointer;
+}
+.profile_icon_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.profile_icon_wrapper > button {
+  cursor: pointer;
+}
+.profile_tag_mobile {
+  display: none;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.Counter {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50%;
+  background-color: var(--buttonPrimary);
+  color: var(--textPrimary);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  user-select: none;
+}
+
+@media (min-width: 200px) and (max-width: 640px) {
+}
+
+@media (min-width: 200px) and (max-width: 560px) {
+}
+
+/* laptopL */
+@media (min-width: 1240px) and (max-width: 1550px) {
+  .Wrapper {
+    max-width: 1230px;
+  }
+}
+/* laptopM */
+@media (min-width: 1024px) and (max-width: 1240px) {
+  .Wrapper {
+    max-width: unset;
+  }
+}
+/* laptopS */
+@media (min-width: 768px) and (max-width: 1024px) {
+}
+/* tabletL */
+@media (min-width: 440px) and (max-width: 768px) {
+}
+/* tabletS */
+@media (min-width: 350px) and (max-width: 440px) {
+}
+/* mobileL */
+@media (min-width: 285px) and (max-width: 350px) {
+}
+/* mobileM */
+@media (min-width: 200px) and (max-width: 285px) {
+}
+/* mobileS */
+@media (min-width: 100px) and (max-width: 200px) {
+}
+
+/* Global */
+@media (min-width: 100px) and (max-width: 1024px) {
+  .Wrapper {
+    max-width: unset;
+    width: 95%;
+  }
+  .MenuButtonWrapper {
+    display: none;
+  }
+  .icons_parent_wrapper {
+    display: none;
+  }
+  .profile_tag_mobile {
+    display: block;
+  }
+}

@@ -1,0 +1,104 @@
+.ContentWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 60px;
+}
+
+.HeaderWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.HeaderWrapper > h3 {
+  font-family: var(--font-ricordi);
+  font-size: 3.2rem;
+  margin: 0;
+  color: var(--textPrimary);
+}
+
+.FlexWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.SliderWrapper {
+  width: 100%;
+  display: flex;
+  padding-top: 5px;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+/* tabletL */
+@media (min-width: 440px) and (max-width: 768px) {
+  .HeaderWrapper > h3 {
+    font-size: 1.8rem;
+  }
+}
+/* tabletS */
+@media (min-width: 350px) and (max-width: 440px) {
+  .HeaderWrapper > h3 {
+    font-size: 1.2rem;
+  }
+}
+/* mobileL */
+@media (min-width: 285px) and (max-width: 350px) {
+}
+/* mobileM */
+@media (min-width: 200px) and (max-width: 285px) {
+}
+/* mobileS */
+@media (min-width: 100px) and (max-width: 200px) {
+}
+
+/* Global 1 */
+@media (min-width: 100px) and (max-width: 1550px) {
+  .FlexWrapper::after {
+    content: '';
+    box-shadow: inset -35px 0px 20px -18px #595959;
+    width: 100px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 0px;
+  }
+  .SliderWrapper {
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+}
+
+/* Global 2 */
+@media (min-width: 100px) and (max-width: 1024px) {
+}
+
+/* Global 3 */
+@media (min-width: 100px) and (max-width: 768px) {
+  .ContentWrapper {
+    gap: 0;
+  }
+  .HeaderWrapper {
+    align-items: flex-start;
+    padding: 20px;
+  }
+}
+
+/* Global 4 */
+@media (min-width: 100px) and (max-width: 350px) {
+  .HeaderWrapper > h3 {
+    font-size: 1rem;
+  }
+}

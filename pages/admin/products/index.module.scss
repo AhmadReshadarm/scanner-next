@@ -1,0 +1,42 @@
+.productsHeader {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  &__title {
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 2rem;
+    margin-bottom: 20px;
+  }
+
+  &__createProductButton {
+    margin-right: 0px;
+    margin-left: auto;
+    font-size: 0.9rem;
+  }
+}
+
+.spinner {
+  display: block;
+  margin-top: 100px;
+}
+
+.createProductForm {
+  &__buttonsStack {
+    &__submitButton {
+      margin-right: 10px;
+    }
+  }
+}
+
+.createProductHeader {
+  &__title {
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 2rem;
+    margin-bottom: 20px;
+  }
+}

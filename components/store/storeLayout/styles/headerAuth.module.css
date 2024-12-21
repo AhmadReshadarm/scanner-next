@@ -1,0 +1,187 @@
+.PopupWrapper {
+  width: 80%;
+  height: 590px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 99;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 0 0 50px 50px;
+}
+
+.header_authorization_form_background {
+  width: calc(100% + 50vw);
+  height: 100%;
+  position: absolute;
+  top: 0;
+  right: -50vw;
+  background-color: var(--glassmorphismBg);
+  -webkit-backdrop-filter: blur(9px);
+  backdrop-filter: blur(9px);
+  z-index: -1;
+}
+
+.AuthContent {
+  width: 100%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--backgroundPrimary);
+  overflow: hidden;
+}
+
+.AuthorizationWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 30px;
+}
+
+.auth_intial_image_wrapper {
+  width: 45%;
+  display: flex;
+  align-items: center;
+}
+
+.auth_intial_image_wrapper > img {
+  width: 100%;
+  height: 370px;
+  object-fit: cover;
+}
+.auth_parrent_wrapper {
+  width: 55%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  padding: 60px;
+}
+
+.AuthHeader {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.AuthHeader > h3 {
+  font-family: var(--font-ricordi);
+  font-size: 2rem;
+}
+.AuthHeader > span {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.AuthTabWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  z-index: 9;
+}
+
+.auth_buttons_row > h2 {
+  font-family: var(--font-ricordi);
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--textBase);
+}
+
+.auth_buttons_row > h2:hover {
+  color: var(--buttonPrimary);
+}
+
+.auth_page_indecator {
+  width: 50px;
+  height: 3px;
+  background-color: var(--buttonPrimary);
+}
+.auth_buttons_row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.helper_box_wrapper {
+  position: absolute;
+  top: 35px;
+  left: 100px;
+  width: 150px;
+  background-color: #000;
+  border-radius: 10px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+
+.box {
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  padding: 20px;
+  position: relative;
+  float: left;
+}
+.helper_close_btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.arrow_top:after {
+  content: ' ';
+  position: absolute;
+  right: 60px;
+  top: -10px;
+  border-top: none;
+  border-right: 15px solid transparent;
+  border-left: 15px solid transparent;
+  border-bottom: 15px solid black;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+
+.sign_in_tab {
+  color: var(--buttonPrimary) !important;
+}
+
+.sign_up_tab {
+  color: var(--buttonPrimary) !important;
+}
+
+.Loading {
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff59;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Global */
+@media (min-width: 100px) and (max-width: 1024px) {
+  .AuthorizationWrapper {
+    padding: 30px 0;
+  }
+  .auth_intial_image_wrapper {
+    display: none;
+  }
+  .auth_parrent_wrapper {
+    width: 100%;
+    padding: 0;
+  }
+}

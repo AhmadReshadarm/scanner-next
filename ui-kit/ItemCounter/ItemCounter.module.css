@@ -1,0 +1,60 @@
+.ItemCounterWrapper {
+  width: 150px;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border: solid 1px;
+  border-radius: 30px;
+  padding: 0 5px 0 0;
+}
+
+.counter_action_buttons_wrapper {
+  width: 130px;
+  height: 100%;
+  border-radius: 30px;
+  background-color: #e2dad0;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.counter_action_buttons_wrapper > button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.counter_action_buttons_wrapper > input {
+  width: 40px;
+  height: 30px;
+  border-radius: 3px;
+  background-color: #d6cec1;
+  border: none;
+  text-align: center;
+  padding: 3px;
+  font-size: 16px;
+}
+.counter_action_buttons_wrapper
+  > input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.counter_action_buttons_wrapper
+  > input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.remove_from_cart_action_button {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}

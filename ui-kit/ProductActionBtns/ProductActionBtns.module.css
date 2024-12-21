@@ -1,0 +1,143 @@
+.CartButtonWrapper {
+  width: 150px;
+  height: 50px;
+  border-radius: 30px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.content_wrapper {
+  background-color: var(--buttonPrimary);
+  width: 150px;
+  height: 50px;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.content_wrapper > span {
+  color: var(--textPrimary);
+}
+
+.content_wrapper:active {
+  background-color: var(--backgroundPrimary);
+  border: 1px solid;
+}
+.content_wrapper > span:active {
+  color: var(--textSecondary);
+}
+
+.content_indecator {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+@keyframes loading {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.Loader {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.Loader:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-100px);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: loading 0.8s infinite;
+}
+
+.WishlistButtonWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  width: 150px;
+  height: 50px;
+  position: relative;
+  overflow: hidden;
+}
+
+.InWishlistButtonContent {
+  width: 150px;
+  height: 50px;
+  border-radius: 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: 200ms;
+  position: relative;
+  overflow: hidden;
+}
+
+.InWishlistButtonContent > span {
+  color: var(--textSecondary);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.InWishlistButtonContent:active {
+  background: #c1ab93;
+  border: none;
+}
+
+/* laptopM */
+@media (min-width: 1024px) and (max-width: 1240px) {
+  .CartButtonWrapper {
+    width: 140px;
+  }
+
+  .WishlistButtonWrapper {
+    width: 140px;
+  }
+  .InWishlistButtonContent {
+    width: 140px;
+  }
+}
+
+/* tabletS */
+@media (min-width: 350px) and (max-width: 440px) {
+  .CartButtonWrapper {
+    width: 125px;
+  }
+  .WishlistButtonWrapper {
+    width: 125px;
+  }
+  .InWishlistButtonContent {
+    width: 125px;
+  }
+}

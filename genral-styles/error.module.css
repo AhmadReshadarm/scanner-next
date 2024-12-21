@@ -1,0 +1,91 @@
+.Container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  background-color: var(--textPrimary);
+}
+
+.Wrapper {
+  width: 100%;
+  max-width: 1500px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.Content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  user-select: none;
+}
+
+.ErrorWrapper {
+  text-align: center;
+  font-size: 3rem;
+  font-family: var(--font-ricordi);
+  font-weight: 600;
+  background: linear-gradient(
+    90deg,
+    #cda172 -6.8%,
+    #fef5ca 34.14%,
+    #fff8d7 50.87%,
+    #fdf3c8 66.52%,
+    #cda172 107.04%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  z-index: 2;
+}
+
+.ContentWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px;
+  z-index: 2;
+}
+
+.ContentWrapper > h4 {
+  font-size: 1.5rem;
+  font-family: var(--font-ricordi);
+  font-weight: 300;
+  color: #fff;
+}
+
+.ContentWrapper > h2 {
+  font-size: 1.5rem;
+  font-family: var(--font-ricordi);
+  font-weight: 300;
+  color: #fff;
+}
+
+/* laptopL */
+@media (min-width: 1240px) and (max-width: 1550px) {
+  .Wrapper {
+    max-width: 1230px;
+  }
+}
+/* laptopM */
+@media (min-width: 1024px) and (max-width: 1240px) {
+  .Wrapper {
+    max-width: unset;
+  }
+}
+
+/* Global */
+@media (min-width: 100px) and (max-width: 1024px) {
+  .Wrapper {
+    max-width: unset;
+    width: 95%;
+  }
+}

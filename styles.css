@@ -1,0 +1,179 @@
+:root {
+  --font-Circe: 'Circe';
+  --font-Jost: 'Jost';
+  --font-ricordi: 'ricordi';
+  --textPrimary: #ffffff;
+  --buttonPrimary: #000000;
+  --textSecondary: #000000;
+  --boxShadowBtn: rgba(0, 0, 0, 0.25);
+  --textTertiary: #707f8d;
+  --textBase: #949494;
+  --backgroundSecondery: #eee8dc;
+  --glassmorphismBg: rgba(236, 238, 231, 0.6);
+  --glassmorphismSeconderBG: rgba(26, 26, 26, 0.4);
+  --backgroundPrimary: #ffffff;
+  --productCart: #f5f1ec;
+  --bgProduct: #f9f9f9;
+  --hover: #ed3969;
+  --yellow: #edba64;
+}
+
+/* @font-face {
+  font-family: 'Jost';
+  src: url('/fonts/Jost/Jost-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: 400;
+  font-display: swap;
+} */
+
+/* ---------------------------------- Circe font ----------------------------------------- */
+
+@font-face {
+  font-family: 'Circe';
+  src: url('/fonts/circe/circe-light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Circe';
+  src: url('/fonts/circe/circe-regular.woff') format('woff');
+  font-weight: normal;
+  font-style: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Circe';
+  src: url('/fonts/circe/circe-bold.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------- Circe font end ----------------------------------------- */
+@font-face {
+  font-family: 'ricordi';
+  src: url('/fonts/tt-ricordi-marmo-trial-variable.woff') format('woff');
+  font-style: normal;
+  font-display: swap;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-Jost), Arial;
+  font-weight: 400;
+}
+
+body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: black;
+}
+
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+svg:focus {
+  outline: none;
+}
+
+/* button:focus, */
+input:focus {
+  outline: none;
+}
+
+button {
+  border: none;
+  background: transparent;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+/* custom scroll bar */
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(60, 60, 60);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #000;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 25px;
+  margin: auto;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.exclamation-icon {
+  color: rgb(196, 0, 0);
+  line-height: 0;
+  font-size: 2rem;
+  position: relative;
+  left: -7px;
+  top: 0px;
+}
+
+.spinner {
+  display: block;
+  margin-top: 100px;
+}
+
+.success-icon {
+  color: green;
+  line-height: 0;
+  font-size: 2rem;
+  position: relative;
+  left: -7px;
+  top: 0px;
+}
+
+.ant-carousel .slick-list .slick-slide > div > div {
+  text-align: center;
+}
+
+/* custom css for antd pagesize */
+@media only screen and (max-width: 576px) {
+  .ant-pagination {
+    position: relative;
+    padding-bottom: 40px;
+  }
+  .ant-pagination .ant-pagination-options {
+    display: block;
+    position: absolute;
+    bottom: 0;
+  }
+}

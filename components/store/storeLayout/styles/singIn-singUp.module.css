@@ -1,0 +1,130 @@
+.Content {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 70px;
+  left: 0;
+  padding: 60px;
+}
+
+.Content > a {
+  width: 100%;
+  text-align: start;
+  padding: 10px 0;
+}
+
+.AuthorizationFormWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.FormWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.form_inputs_wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 15px;
+}
+.action_buttons_wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.action_buttons_wrapper > button {
+  width: 100%;
+  height: 50px;
+  border-radius: 30px;
+  background-color: var(--buttonPrimary);
+  color: var(--textPrimary);
+  font-family: var(--font-ricordi);
+}
+
+.action_buttons_wrapper > button:active {
+  border: 1px solid;
+  background-color: var(--backgroundPrimary) !important;
+  color: var(--textSecondary);
+}
+.newsletter_wrapper {
+  padding: 5px 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+}
+
+.AuthInputsWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 5px;
+  position: relative;
+}
+
+.newsletter_wrapper > label {
+  width: 96%;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool_tip {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  cursor: help;
+}
+.required {
+  color: var(--hover);
+}
+
+.AuthInput {
+  width: 100%;
+  padding: 5px 10px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid;
+  font-size: 16px;
+}
+
+.Loading {
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff59;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Global */
+@media (min-width: 100px) and (max-width: 1024px) {
+  .Content {
+    padding: 0;
+  }
+}

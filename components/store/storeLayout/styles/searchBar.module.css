@@ -1,0 +1,235 @@
+.SearchFormWrapper {
+  width: 100%;
+  position: absolute;
+  top: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  z-index: 10;
+  padding: 30px 0;
+}
+
+.header_Search_background {
+  width: 100vw;
+  height: 250px;
+  position: absolute;
+  top: -90px;
+  background-color: var(--glassmorphismBg);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  z-index: -1;
+}
+
+.SearchForm {
+  width: 600px;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  padding: 0 5px 0 15px;
+  align-items: center;
+  border-radius: 30px;
+  background-color: var(--backgroundPrimary);
+  gap: 10px;
+}
+
+.search_header_clear_button {
+  width: 30px;
+  height: 30px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.SearchFieldInput {
+  position: relative;
+  width: 100%;
+  height: 45px;
+  border: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.SearchBtn {
+  cursor: pointer;
+  background-color: var(--buttonPrimary);
+  min-width: 110px;
+  height: 40px;
+  border-radius: 30px;
+  transition: 150ms;
+}
+
+.SearchBtn:active {
+  background-color: var(--backgroundPrimary);
+  border: 1px solid;
+}
+
+.SearchBtn > span:active {
+  color: var(--textSecondary);
+}
+.SearchBtn > span {
+  color: var(--textPrimary);
+}
+
+.ResultsWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  position: absolute;
+  top: 160px;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--backgroundPrimary);
+}
+
+.ResultsContent {
+  width: 100%;
+  max-width: 1500px;
+  height: 80vh;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto;
+  justify-content: space-evenly;
+  justify-items: center;
+  align-items: center;
+  padding: 15px;
+  gap: 30px;
+  overflow-x: hidden;
+}
+
+.ResultsContent::-webkit-scrollbar {
+  width: 5px;
+}
+
+.EmptyResultAndLoaderWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.EmptyResultAndLoaderWrapper > span {
+  text-align: center;
+  margin-top: -300px;
+}
+
+@keyframes loading {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.Loader {
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  background: #cccccca3;
+  position: relative;
+  overflow: hidden;
+}
+
+.Loader:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateX(-100px);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: loading 0.8s infinite;
+}
+
+/* laptopL */
+@media (min-width: 1240px) and (max-width: 1550px) {
+  .ResultsContent {
+    max-width: 1400px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+/* laptopM */
+@media (min-width: 1024px) and (max-width: 1240px) {
+  .ResultsContent {
+    max-width: 1230px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+/* laptopS */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .ResultsContent {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: unset;
+    width: 95%;
+  }
+}
+/* tabletL */
+@media (min-width: 440px) and (max-width: 768px) {
+  .ResultsContent {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: unset;
+    width: 95%;
+  }
+}
+/* tabletS */
+@media (min-width: 350px) and (max-width: 440px) {
+  .ResultsContent {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: unset;
+    width: 95%;
+  }
+}
+/* mobileL */
+@media (min-width: 285px) and (max-width: 350px) {
+  .ResultsContent {
+    grid-template-columns: repeat(1, 1fr);
+    max-width: unset;
+    width: 95%;
+  }
+}
+/* mobileM */
+@media (min-width: 200px) and (max-width: 285px) {
+  .ResultsContent {
+    grid-template-columns: repeat(1, 1fr);
+    max-width: unset;
+    width: 95%;
+  }
+}
+/* mobileS */
+@media (min-width: 100px) and (max-width: 200px) {
+  .ResultsContent {
+    grid-template-columns: repeat(1, 1fr);
+    max-width: unset;
+    width: 95%;
+  }
+}
+
+/* Global */
+@media (min-width: 100px) and (max-width: 1024px) {
+  .SearchFormWrapper {
+    position: unset;
+    display: none;
+  }
+  .SearchForm {
+    width: 100%;
+    border: 1px solid;
+  }
+
+  .ResultsWrapper {
+    top: 200px;
+    background-color: var(--glassmorphismBg);
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+  }
+}

@@ -1,0 +1,40 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+.env
+# dependencies
+/node_modules
+/.next
+/out
+/android
+/resources
+/.env.local
+/public/temp/*
+package-lock.json
+**/package-lock.json
+# testing
+# /coverage
+
+# production
+/build
+/swagger/services
+
+# localhost data
+# /public/favicon.ico
+
+# misc
+.DS_Store
+.eslintcache
+.idea
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+debug.log
+
+#sitemap
+/public/sitemap.xml
+/public/sitemap-0.xml
+robots.txt
+
+#cache
+/webprojnpm-cache
+nginx.conf
