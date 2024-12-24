@@ -37,10 +37,10 @@ const Scanner = () => {
           ); // Example: Increase contrast by 20% and brightness by 20
 
           // 2. Noise Reduction (Simple Gaussian Blur)
-          const filteredImageData = applyGaussianBlur(adjustedImageData, 3); // Example: Apply a 3x3 Gaussian blur
+          //   const filteredImageData = applyGaussianBlur(adjustedImageData, 3); // Example: Apply a 3x3 Gaussian blur
 
           // 3. Edge Detection (Simplified Sobel Operator)
-          const edges = detectEdges(filteredImageData);
+          const edges = detectEdges(adjustedImageData);
 
           // Draw edges for visualization (optional)
           context.clearRect(0, 0, canvas.width, canvas.height);
@@ -48,9 +48,9 @@ const Scanner = () => {
 
           // Decode QR code
           const code = jsQR(
-            filteredImageData.data,
-            filteredImageData.width,
-            filteredImageData.height,
+            adjustedImageData.data,
+            adjustedImageData.width,
+            adjustedImageData.height,
           );
 
           if (code) {
