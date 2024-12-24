@@ -284,12 +284,12 @@ const Scanner = () => {
             contours,
           );
 
-          // 3. Edge Detection (Simplified Sobel Operator)
-          const edges = detectEdges(croppedImageData);
+          //   // 3. Edge Detection (Simplified Sobel Operator)
+          //   const edges = detectEdges(croppedImageData);
 
-          // Draw edges for visualization (optional)
-          context.clearRect(0, 0, canvas.width, canvas.height);
-          context.putImageData(edges, 0, 0);
+          //   // Draw edges for visualization (optional)
+          //   context.clearRect(0, 0, canvas.width, canvas.height);
+          //   context.putImageData(edges, 0, 0);
 
           // 6. Decode QR code
           const code = jsQR(
@@ -596,7 +596,7 @@ const Scanner = () => {
   }
 
   return (
-    <div>
+    <>
       <video
         ref={videoRef}
         style={{
@@ -623,7 +623,7 @@ const Scanner = () => {
           <p>{scanResult}</p>
         </div>
       )}
-    </div>
+    </>
   );
 };
 
