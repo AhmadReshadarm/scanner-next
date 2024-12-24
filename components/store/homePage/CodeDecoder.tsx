@@ -11,7 +11,10 @@ import styles from './styles/main.module.css';
 //     ssr: false, // Disable server-side rendering
 //   },
 // );
-import { Scanner } from '@yudiel/react-qr-scanner';
+// import { Scanner } from '@yudiel/react-qr-scanner';
+const Scanner = dynamic(() =>
+  import('@yudiel/react-qr-scanner').then((mod) => mod.Scanner),
+);
 
 const CodeDecoder = () => {
   const dispatch = useAppDispatch();
