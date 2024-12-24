@@ -5,19 +5,15 @@ import { openErrorNotification } from 'common/helpers';
 import { useAppDispatch } from 'redux/hooks';
 import { createScanner, fetchScanners } from 'redux/slicers/scannerSlicer';
 import styles from './styles/main.module.css';
-// const BarcodeScannerComponent = dynamic(
-//   () => import('react-qr-barcode-scanner'),
-//   {
-//     ssr: false, // Disable server-side rendering
-//   },
-// );
+const BarcodeScannerComponent = dynamic(
+  () => import('react-qr-barcode-scanner'),
+  {
+    ssr: false, // Disable server-side rendering
+  },
+);
 // import { Scanner } from '@yudiel/react-qr-scanner';
 const Scanner = dynamic(() =>
   import('@yudiel/react-qr-scanner').then((mod) => mod.Scanner),
-);
-
-const boundingBox = dynamic(() =>
-  import('@yudiel/react-qr-scanner').then((mod) => mod.boundingBox),
 );
 
 const CodeDecoder = () => {
@@ -97,29 +93,30 @@ const CodeDecoder = () => {
           />
         )}
         {cameraOpenBar && (
-          // <BarcodeScannerComponent
-          //   id="camera-view"
-          //   width={300}
-          //   height={300}
-          //   onUpdate={(err, result) => {
-          //     if (result) {
-          //       setBarData(result.text);
-          //       setCameraOpenBar(false);
-          //     } else {
-          //       setBarData('-');
-          //     }
-          //   }}
-          // />
-          <Scanner
-            onScan={(result) => {
+          <BarcodeScannerComponent
+            id="camera-view"
+            width={300}
+            height={300}
+            onUpdate={(err, result) => {
               if (result) {
-                setBarData(result[0].rawValue);
+                setBarData(result.text);
                 setCameraOpenBar(false);
               } else {
                 setBarData('-');
               }
             }}
           />
+          // <Scanner
+
+          //   onScan={(result) => {
+          //     if (result) {
+          //       setBarData(result[0].rawValue);
+          //       setCameraOpenBar(false);
+          //     } else {
+          //       setBarData('-');
+          //     }
+          //   }}
+          // />
         )}
       </div>
       <div className={styles.scannedCodesWrapper}>
