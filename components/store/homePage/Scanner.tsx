@@ -240,7 +240,9 @@ const Scanner = () => {
     const getCameraPermission = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: {
+            facingMode: 'environment', // Use the back camera
+          },
         });
         const video = videoRef.current;
         const canvas = canvasRef.current;
@@ -595,8 +597,24 @@ const Scanner = () => {
 
   return (
     <div>
-      <video ref={videoRef} width="640" height="480" autoPlay />
-      <canvas ref={canvasRef} width="640" height="480" />
+      <video
+        ref={videoRef}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+        }}
+        autoPlay
+      />
+      <canvas
+        ref={canvasRef}
+        width="100%"
+        height="100%"
+        style={{ position: 'absolute', top: 0, left: 0 }}
+      />
       {scanResult && (
         <div>
           <h3>Scanned Result:</h3>
