@@ -40,6 +40,8 @@ const CodeDecoder = () => {
   const handleScanUpload = () => {
     if (qrData !== '-' && barData !== '-') {
       dispatch(createScanner({ id: '', qrCode: qrData, barCode: barData }));
+      setQrData('-');
+      setBarData('-');
       dispatch(fetchScanners({ limit: 12, offset: 0 }));
     } else {
       openErrorNotification('Сканировать QR-код и штрих-код');
