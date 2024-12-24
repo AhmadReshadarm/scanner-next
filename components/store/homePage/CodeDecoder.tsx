@@ -16,6 +16,10 @@ const Scanner = dynamic(() =>
   import('@yudiel/react-qr-scanner').then((mod) => mod.Scanner),
 );
 
+const boundingBox = dynamic(() =>
+  import('@yudiel/react-qr-scanner').then((mod) => mod.boundingBox),
+);
+
 const CodeDecoder = () => {
   const dispatch = useAppDispatch();
 
@@ -109,10 +113,10 @@ const CodeDecoder = () => {
           <Scanner
             onScan={(result) => {
               if (result) {
-                setQrData(result[0].rawValue);
-                setCameraOpenQr(false);
+                setBarData(result[0].rawValue);
+                setCameraOpenBar(false);
               } else {
-                setQrData('-');
+                setBarData('-');
               }
             }}
           />
