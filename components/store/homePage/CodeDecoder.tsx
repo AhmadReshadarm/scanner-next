@@ -12,9 +12,10 @@ const BarcodeScannerComponent = dynamic(
   },
 );
 // import { Scanner } from '@yudiel/react-qr-scanner';
-const Scanner = dynamic(() =>
-  import('@yudiel/react-qr-scanner').then((mod) => mod.Scanner),
-);
+// const Scanner = dynamic(() =>
+//   import('@yudiel/react-qr-scanner').then((mod) => mod.Scanner),
+// );
+import Scanner from './Scanner';
 
 const CodeDecoder = () => {
   const dispatch = useAppDispatch();
@@ -82,14 +83,14 @@ const CodeDecoder = () => {
           //   }}
           // />
           <Scanner
-            onScan={(result) => {
-              if (result) {
-                setQrData(result[0].rawValue);
-                setCameraOpenQr(false);
-              } else {
-                setQrData('-');
-              }
-            }}
+          // onScan={(result) => {
+          //   if (result) {
+          //     setQrData(result[0].rawValue);
+          //     setCameraOpenQr(false);
+          //   } else {
+          //     setQrData('-');
+          //   }
+          // }}
           />
         )}
         {cameraOpenBar && (
