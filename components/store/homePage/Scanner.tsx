@@ -279,10 +279,10 @@ const Scanner = () => {
           const contours = findContours(thresholdedImageData);
 
           // 5. Crop and Resize (Focus on potential QR code region)
-          const croppedImageData = cropAndResize(
-            thresholdedImageData,
-            contours,
-          );
+          //   const croppedImageData = cropAndResize(
+          //     thresholdedImageData,
+          //     contours,
+          //   );
 
           //   // 3. Edge Detection (Simplified Sobel Operator)
           //   const edges = detectEdges(croppedImageData);
@@ -292,11 +292,7 @@ const Scanner = () => {
           //   context.putImageData(edges, 0, 0);
 
           // 6. Decode QR code
-          const code = jsQR(
-            croppedImageData.data,
-            croppedImageData.width,
-            croppedImageData.height,
-          );
+          const code = jsQR(contours.data, contours.width, contours.height);
 
           if (code) {
             setScanResult(code.data);
