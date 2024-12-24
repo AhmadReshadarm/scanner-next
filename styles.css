@@ -178,14 +178,14 @@ h6 {
   }
 }
 
-#camera-container {
+/* #camera-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 40vh; /* Adjust the height as needed */
+  height: 40vh; 
   margin-top: 50px;
   position: relative;
-}
+} */
 
 /* Camera view styles */
 #camera-view {
@@ -265,9 +265,9 @@ p {
 
 /* Responsive styles for smaller screens */
 @media (max-width: 768px) {
-  #camera-container {
-    height: 30vh; /* Adjust for smaller screens */
-  }
+  /* #camera-container {
+    height: 30vh;
+  } */
 
   #camera-view {
     max-height: 300px; /* Adjust for smaller screens */

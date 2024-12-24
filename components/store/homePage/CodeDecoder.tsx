@@ -66,7 +66,7 @@ const CodeDecoder = () => {
         </button>
       </div>
 
-      <div id="camera-container">
+      <div className={styles.cameraWrapper} id="camera-container">
         {cameraOpenQr && (
           // <BarcodeScannerComponent
           //   id="camera-view"
