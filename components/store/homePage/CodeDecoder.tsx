@@ -83,8 +83,10 @@ const CodeDecoder = () => {
           // />
           <Scanner
             onScan={(result) => {
+              console.log(result);
+
               if (result) {
-                setQrData(result.text);
+                setQrData(result);
                 setCameraOpenQr(false);
               } else {
                 setQrData('-');
@@ -108,8 +110,9 @@ const CodeDecoder = () => {
           // />
           <Scanner
             onScan={(result) => {
+              console.log(result);
               if (result) {
-                setQrData(result.text);
+                setQrData(result);
                 setCameraOpenQr(false);
               } else {
                 setQrData('-');
