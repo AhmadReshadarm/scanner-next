@@ -364,6 +364,15 @@ type TProfileState = {
   saveLoading: boolean;
 };
 
+type TScannerPayload = {
+  id?: string;
+  qrCode?: string;
+  sortBy?: 'id';
+  orderBy?: 'DESC' | 'ASC';
+  limit?: number;
+  offset?: number;
+};
+
 export type {
   TCategoryState,
   TAuthState,
@@ -403,4 +412,5 @@ export type {
   TSubscribers,
   MailOptionsDTO,
   TScanner,
+  TScannerPayload,
 };

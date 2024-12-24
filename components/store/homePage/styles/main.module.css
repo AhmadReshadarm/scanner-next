@@ -25,7 +25,7 @@
 }
 
 .CodesWrapper {
-  width: 90%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -38,7 +38,14 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+}
+
+.actionButtonsWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 .scannerWrapper {
@@ -48,6 +55,32 @@
   position: relative;
 }
 
+.scannedCodesWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.qrCodeScannerWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+}
+
+.barCodeScannerWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+}
 /* laptopL */
 @media (min-width: 1240px) and (max-width: 1550px) {
   .Wrapper {

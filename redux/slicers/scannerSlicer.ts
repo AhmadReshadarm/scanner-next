@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getErrorMassage, handleError, handlePending } from 'common/helpers';
 import { openSuccessNotification } from 'common/helpers/openSuccessNotidication.helper';
-import { TScanner } from 'redux/types';
+import { TScanner, TScannerPayload } from 'redux/types';
 import { Scanner, ScannerService } from 'swagger/services';
 
 export const createScanner = createAsyncThunk<
@@ -21,7 +21,7 @@ export const createScanner = createAsyncThunk<
 
 export const fetchScanners = createAsyncThunk<
   { rows: Scanner[]; length: number },
-  undefined,
+  TScannerPayload,
   { rejectValue: string }
 >(
   'scanner/fetchScanners',
