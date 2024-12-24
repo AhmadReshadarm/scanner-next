@@ -1,11 +1,9 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { fetchScanners } from 'redux/slicers/scannerSlicer';
 import { TScanner } from 'redux/types';
 import styles from '../components/store/homePage/styles/main.module.css';
-import { QrReader } from 'react-qr-reader';
-
+import CodeDecoder from 'components/store/homePage/CodeDecoder';
 // ---------------------------------------------------------------------------------------
 const IndexPage = () => {
   const [isClient, setClient] = useState(false);
@@ -14,7 +12,7 @@ const IndexPage = () => {
     (state) => state.scanner,
   );
 
-  const [data, setData] = useState('No result');
+  // const [data, setData] = useState('No result');
   useEffect(() => {
     dispatch(fetchScanners());
 
@@ -27,32 +25,8 @@ const IndexPage = () => {
         <div className={styles.Content}>
           <div className={styles.CodesWrapper}>
             <div className={styles.scannerWrapper}>
-              <QrReader
-                onResult={(result, error) => {
-                  if (!!error) {
-                    console.info(error);
-                    return;
-                  }
-
-                  setData(result?.text);
-
-                  // if (!!result) {
-                  //   let value = encryptpwd.decrypt(result?.text, password);
-
-                  //   let time = value.split(';')[1];
-                  //   let answer = Date.now() - time;
-                  //   if (answer > 3000) {
-                  //     setValid(false);
-                  //   } else {
-                  //     setValid(true);
-                  //   }
-                  //   setData(value.split(';')[0]);
-                  // }
-                }}
-                constraints={{ facingMode: 'environment' }}
-                style={{ maxWidth: '500px' }}
-              />
-              <p>{data}</p>
+              {/* <p>{data}</p> */}
+              {isClient ? <CodeDecoder /> : ''}
             </div>
 
             {loading ? (
