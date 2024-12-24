@@ -25,8 +25,7 @@ const IndexPage = () => {
         <div className={styles.Content}>
           <div className={styles.CodesWrapper}>
             <div className={styles.scannerWrapper}>
-              {/* <p>{data}</p> */}
-              {isClient ? <CodeDecoder /> : ''}
+              {isClient && <CodeDecoder />}
             </div>
 
             {loading ? (

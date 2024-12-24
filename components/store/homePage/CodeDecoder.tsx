@@ -1,7 +1,13 @@
 // @ts-nocheck
 import React, { useState } from 'react';
-// import jsQR from 'jsqr';
-// import BarcodeScannerComponent from 'react-qr-barcode-scanner';
+import jsQR from 'jsqr';
+import dynamic from 'next/dynamic';
+const BarcodeScannerComponent = dynamic(
+  () => import('react-qr-barcode-scanner'),
+  {
+    ssr: false, // Disable server-side rendering
+  },
+);
 
 const CodeDecoder = () => {
   const [loadingScan, setLoadingScan] = useState(false);
@@ -44,75 +50,75 @@ const CodeDecoder = () => {
     }
   };
 
-  // const scanQRFromFile = (file) => {
-  //   setLoadingScan(true);
+  const scanQRFromFile = (file) => {
+    setLoadingScan(true);
 
-  //   setError('');
+    setError('');
 
-  //   const reader = new FileReader();
+    const reader = new FileReader();
 
-  //   reader.onload = async (event) => {
-  //     const qrData = event.target!.result;
+    reader.onload = async (event) => {
+      const qrData = event.target!.result;
 
-  //     try {
-  //       const result: any = await scanQRCodeFromData(qrData);
+      try {
+        const result: any = await scanQRCodeFromData(qrData);
 
-  //       if (result) {
-  //         setData(result);
+        if (result) {
+          setData(result);
 
-  //         // Add scanned data to history
+          // Add scanned data to history
 
-  //         setScannedDataHistory([...scannedDataHistory, result]);
-  //       } else {
-  //         setError('No QR code or barcode found in the selected image.');
-  //       }
-  //     } catch (err: any) {
-  //       setError('Error scanning QR code or barcode: ' + err.message);
-  //     }
+          setScannedDataHistory([...scannedDataHistory, result]);
+        } else {
+          setError('На выбранном изображении не найден QR-код или штрихкод.');
+        }
+      } catch (err: any) {
+        setError('Ошибка сканирования QR-кода или штрих-кода: ' + err.message);
+      }
 
-  //     setLoadingScan(false);
-  //   };
+      setLoadingScan(false);
+    };
 
-  //   reader.readAsDataURL(file);
-  // };
+    reader.readAsDataURL(file);
+  };
 
-  // const scanQRCodeFromData = (qrData) => {
-  //   return new Promise((resolve, reject) => {
-  //     const img = new Image();
+  const scanQRCodeFromData = (qrData) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
 
-  //     img.src = qrData;
+      img.src = qrData;
 
-  //     img.onload = () => {
-  //       const canvas = document.createElement('canvas');
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
 
-  //       const ctx: any = canvas.getContext('2d');
+        const ctx: any = canvas.getContext('2d');
 
-  //       canvas.width = img.width;
+        canvas.width = img.width;
 
-  //       canvas.height = img.height;
+        canvas.height = img.height;
 
-  //       ctx.drawImage(img, 0, 0);
+        ctx.drawImage(img, 0, 0);
 
-  //       const imageData = ctx.getImageData(0, 0, img.width, img.height);
+        const imageData = ctx.getImageData(0, 0, img.width, img.height);
 
-  //       try {
-  //         const code = jsQR(imageData.data, imageData.width, imageData.height);
+        try {
+          const code = jsQR(imageData.data, imageData.width, imageData.height);
 
-  //         if (code) {
-  //           resolve(code.data);
-  //         } else {
-  //           reject(new Error('No QR code or barcode found'));
-  //         }
-  //       } catch (err) {
-  //         reject(err);
-  //       }
-  //     };
+          if (code) {
+            resolve(code.data);
+          } else {
+            reject(new Error('QR-код или штрих-код не найдены'));
+          }
+        } catch (err) {
+          reject(err);
+        }
+      };
 
-  //     img.onerror = (err) => {
-  //       reject(err);
-  //     };
-  //   });
-  // };
+      img.onerror = (err) => {
+        reject(err);
+      };
+    });
+  };
 
   const handleScanButtonClick = () => {
     setCameraOpen(!cameraOpen);
@@ -120,42 +126,43 @@ const CodeDecoder = () => {
 
   return (
     <div className="App">
-      <h1>QR Code and Barcode Scanner</h1>
+      <h1>Сканер QR-кода и штрих-кода</h1>
 
       <div id="btn-container">
         <button onClick={handleScanButtonClick}>
-          {cameraOpen ? 'Stop Scanning' : 'Scan QR Code / Barcode'}
+          {cameraOpen
+            ? 'Остановить сканирование'
+            : 'Сканировать QR-код/штрих-код'}
         </button>
 
         <button onClick={handleBrowseButtonClick}>
-          {qrFile ? 'Stop Browse' : 'Browse QR Code / Barcode'}
+          {qrFile ? 'Остановить просмотр' : 'Просмотреть QR-код/штрихкод'}
         </button>
       </div>
 
       <div id="camera-container">
         {cameraOpen && (
-          // <BarcodeScannerComponent
-          //   id="camera-view"
-          //   width={300}
-          //   height={300}
-          //   onUpdate={(err, result) => {
-          //     if (result) {
-          //       setData(result.text);
+          <BarcodeScannerComponent
+            id="camera-view"
+            width={300}
+            height={300}
+            onUpdate={(err, result) => {
+              if (result) {
+                setData(result.text);
 
-          //       // Add scanned data to history
+                // Add scanned data to history
 
-          //       setScannedDataHistory([...scannedDataHistory, result.text]);
-          //     } else {
-          //       setData('Not Found');
-          //     }
-          //   }}
-          // />
-          <p>camera</p>
+                setScannedDataHistory([...scannedDataHistory, result.text]);
+              } else {
+                setData('Не найдено');
+              }
+            }}
+          />
         )}
       </div>
 
       <div className="data">
-        {loadingScan && <p>Loading...</p>}
+        {loadingScan && <p>Загрузка...</p>}
 
         {error && <p>Error: {error}</p>}
 
@@ -169,7 +176,7 @@ const CodeDecoder = () => {
 
         {qrFile && (
           <div>
-            <p>Selected Image:</p>
+            <p>Выбранное изображение:</p>
 
             <img src={URL.createObjectURL(qrFile)} alt="QRCode" />
           </div>
@@ -179,7 +186,7 @@ const CodeDecoder = () => {
       <div>
         {/* <h2>Scanned Data History</h2> */}
 
-        <p>Data: {data}</p>
+        <p>Данные: {data}</p>
 
         <ul>
           {scannedDataHistory.map((item, index) => (
