@@ -24,6 +24,7 @@ const CodeDecoder = () => {
   const [cameraOpenQr, setCameraOpenQr] = useState(false);
   const [cameraOpenBar, setCameraOpenBar] = useState(false);
   const [isQrDetected, setIsQrDetected] = useState(false);
+  const [qrCodeLocation, setQrCodeLocation] = useState(null);
   const handleScanQrButtonClick = () => {
     if (cameraOpenBar) {
       openErrorNotification('Сначала закройте камеру для штрих-кода.');
@@ -84,25 +85,35 @@ const CodeDecoder = () => {
           //     }
           //   }}
           // />
-          <Scanner
-            onScan={(result) => {
-              console.log(result);
-
-              setIsQrDetected(true);
-              if (result) {
-                setQrData(result[0].rawValue);
-                setCameraOpenQr(false);
-              } else {
-                setQrData('-');
-              }
+          <div
+            style={{
+              top: qrCodeLocation.y,
+              left: qrCodeLocation.x,
+              width: qrCodeLocation.width,
+              height: qrCodeLocation.height,
             }}
-            onError={handleError}
-            constraints={{
-              facingMode: 'environment', // Use the rear camera
-              width: { min: 76, max: 380 }, // Adjust min/max width based on desired QR code size
-              height: { min: 76, max: 380 }, // Adjust min/max height based on desired QR code size
-            }}
-          />
+            className={styles.qr_code_highlight}
+          >
+            <Scanner
+              onScan={(result) => {
+                console.log(result);
+                setQrCodeLocation(result[0].boundingBox);
+                setIsQrDetected(true);
+                if (result) {
+                  setQrData(result[0].rawValue);
+                  setCameraOpenQr(false);
+                } else {
+                  setQrData('-');
+                }
+              }}
+              onError={handleError}
+              constraints={{
+                facingMode: 'environment', // Use the rear camera
+                width: { min: 76, max: 380 }, // Adjust min/max width based on desired QR code size
+                height: { min: 76, max: 380 }, // Adjust min/max height based on desired QR code size
+              }}
+            />
+          </div>
         )}
         {cameraOpenBar && (
           <BarcodeScannerComponent
