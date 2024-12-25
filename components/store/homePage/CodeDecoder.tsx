@@ -88,12 +88,12 @@ const CodeDecoder = () => {
           //   }}
           // />
           <div
-            // style={{
-            //   top: qrCodeLocation.y ?? '',
-            //   left: qrCodeLocation.x,
-            //   width: qrCodeLocation.width,
-            //   height: qrCodeLocation.height,
-            // }}
+            style={{
+              top: qrCodeLocation.y,
+              left: qrCodeLocation.x,
+              width: qrCodeLocation.width,
+              height: qrCodeLocation.height,
+            }}
             className={styles.qr_code_highlight}
           >
             <Scanner
