@@ -24,7 +24,12 @@ const CodeDecoder = () => {
   const [cameraOpenQr, setCameraOpenQr] = useState(false);
   const [cameraOpenBar, setCameraOpenBar] = useState(false);
   const [isQrDetected, setIsQrDetected] = useState(false);
-  const [qrCodeLocation, setQrCodeLocation] = useState({});
+  const [qrCodeLocation, setQrCodeLocation] = useState({
+    x: 0,
+    y: 0,
+    width: 250,
+    height: 250,
+  });
   const handleScanQrButtonClick = () => {
     if (cameraOpenBar) {
       openErrorNotification('Сначала закройте камеру для штрих-кода.');
@@ -73,6 +78,15 @@ const CodeDecoder = () => {
       </div>
 
       <div className={styles.cameraWrapper}>
+        <div
+          style={{
+            top: qrCodeLocation.y,
+            left: qrCodeLocation.x,
+            width: `${qrCodeLocation.width}px`,
+            height: `${qrCodeLocation.height}px`,
+          }}
+          className={styles.qr_code_highlight}
+        />
         {cameraOpenQr && (
           // <BarcodeScannerComponent
           //   id="camera-view"
@@ -87,35 +101,25 @@ const CodeDecoder = () => {
           //     }
           //   }}
           // />
-          <>
-            <Scanner
-              onScan={(result) => {
-                setIsQrDetected(true);
-                if (result) {
-                  setQrCodeLocation(result[0].boundingBox);
-                  setQrData(result[0].rawValue);
-                  // setCameraOpenQr(false);
-                } else {
-                  setQrData('-');
-                }
-              }}
-              onError={handleError}
-              constraints={{
-                facingMode: 'environment', // Use the rear camera
-                width: { min: 10, max: 900 }, // Adjust min/max width based on desired QR code size
-                height: { min: 10, max: 900 }, // Adjust min/max height based on desired QR code size
-              }}
-            />
-            <div
-              style={{
-                top: qrCodeLocation.y,
-                left: qrCodeLocation.x,
-                width: qrCodeLocation.width,
-                height: qrCodeLocation.height,
-              }}
-              className={styles.qr_code_highlight}
-            />
-          </>
+
+          <Scanner
+            onScan={(result) => {
+              if (result) {
+                setQrCodeLocation(result[0].boundingBox);
+                setQrData(result[0].rawValue);
+                // setCameraOpenQr(false);
+              } else {
+                setQrData('-');
+                setQrCodeLocation({ x: 0, y: 0, width: 250, height: 250 });
+              }
+            }}
+            onError={handleError}
+            constraints={{
+              facingMode: 'environment', // Use the rear camera
+              width: { min: 10, max: 900 }, // Adjust min/max width based on desired QR code size
+              height: { min: 10, max: 900 }, // Adjust min/max height based on desired QR code size
+            }}
+          />
         )}
         {cameraOpenBar && (
           <BarcodeScannerComponent
