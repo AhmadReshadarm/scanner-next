@@ -102,8 +102,8 @@ const CodeDecoder = () => {
               onError={handleError}
               constraints={{
                 facingMode: 'environment', // Use the rear camera
-                width: { min: 10, max: 100 }, // Adjust min/max width based on desired QR code size
-                height: { min: 10, max: 100 }, // Adjust min/max height based on desired QR code size
+                width: { min: 10, max: 900 }, // Adjust min/max width based on desired QR code size
+                height: { min: 10, max: 900 }, // Adjust min/max height based on desired QR code size
               }}
             />
             <div
