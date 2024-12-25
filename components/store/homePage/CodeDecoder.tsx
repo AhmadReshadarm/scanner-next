@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { openErrorNotification } from 'common/helpers';
 import { useAppDispatch } from 'redux/hooks';
@@ -24,7 +24,7 @@ const CodeDecoder = () => {
   const [cameraOpenQr, setCameraOpenQr] = useState(false);
   const [cameraOpenBar, setCameraOpenBar] = useState(false);
   const [isQrDetected, setIsQrDetected] = useState(false);
-  const [qrCodeLocation, setQrCodeLocation] = useState(null);
+  const [qrCodeLocation, setQrCodeLocation] = useState({});
   const handleScanQrButtonClick = () => {
     if (cameraOpenBar) {
       openErrorNotification('Сначала закройте камеру для штрих-кода.');
@@ -55,7 +55,9 @@ const CodeDecoder = () => {
   const handleError = (error) => {
     console.error(error);
   };
-
+  useEffect(() => {
+    console.log(qrCodeLocation);
+  }, [qrCodeLocation]);
   return (
     <div className="App">
       <h1>Сканер QR-кода и штрих-кода</h1>
@@ -86,22 +88,21 @@ const CodeDecoder = () => {
           //   }}
           // />
           <div
-            style={{
-              top: qrCodeLocation.y,
-              left: qrCodeLocation.x,
-              width: qrCodeLocation.width,
-              height: qrCodeLocation.height,
-            }}
+            // style={{
+            //   top: qrCodeLocation.y ?? '',
+            //   left: qrCodeLocation.x,
+            //   width: qrCodeLocation.width,
+            //   height: qrCodeLocation.height,
+            // }}
             className={styles.qr_code_highlight}
           >
             <Scanner
               onScan={(result) => {
-                console.log(result);
-                setQrCodeLocation(result[0].boundingBox);
                 setIsQrDetected(true);
                 if (result) {
+                  setQrCodeLocation(result[0].boundingBox);
                   setQrData(result[0].rawValue);
-                  setCameraOpenQr(false);
+                  // setCameraOpenQr(false);
                 } else {
                   setQrData('-');
                 }
