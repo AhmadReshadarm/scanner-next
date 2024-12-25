@@ -84,6 +84,7 @@ const CodeDecoder = () => {
             left: qrCodeLocation.x,
             width: `${qrCodeLocation.width}px`,
             height: `${qrCodeLocation.height}px`,
+            display: cameraOpenQr ? 'flex' : 'none',
           }}
           className={styles.qr_code_highlight}
         />
@@ -116,8 +117,8 @@ const CodeDecoder = () => {
             onError={handleError}
             constraints={{
               facingMode: 'environment', // Use the rear camera
-              width: { min: 10, max: 900 }, // Adjust min/max width based on desired QR code size
-              height: { min: 10, max: 900 }, // Adjust min/max height based on desired QR code size
+              width: { min: 1, max: 1000 }, // Adjust min/max width based on desired QR code size
+              height: { min: 1, max: 1000 }, // Adjust min/max height based on desired QR code size
             }}
           />
         )}
