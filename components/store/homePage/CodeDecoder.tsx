@@ -128,7 +128,7 @@ const CodeDecoder = () => {
           <Scanner
             onScan={(result) => {
               if (result) {
-                isQrDetected(true);
+                setIsQrDetected(true);
                 setQrCodeLocation(result[0].boundingBox);
                 setQrData(result[0].rawValue);
 
@@ -137,7 +137,7 @@ const CodeDecoder = () => {
                 // }, 2000);
               } else {
                 setQrData('-');
-                isQrDetected(true);
+                setIsQrDetected(true);
                 setQrCodeLocation({
                   x: 'auto',
                   y: 'auto',
