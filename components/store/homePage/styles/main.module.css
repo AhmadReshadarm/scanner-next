@@ -41,6 +41,16 @@
   justify-content: flex-start;
 }
 
+.scannerDataWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  overflow-x: scroll;
+}
+
 .cameraWrapper {
   width: 100%;
   height: 60vh;

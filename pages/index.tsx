@@ -58,7 +58,7 @@ const IndexPage = () => {
             {loading ? (
               <>loading...</>
             ) : (
-              <>
+              <div className={styles.scannerDataWrapper}>
                 <div className={styles.itemWrapper}>
                   <p>ID</p>
                   <p>|</p>
@@ -102,7 +102,7 @@ const IndexPage = () => {
                     </div>
                   );
                 })}
-              </>
+              </div>
             )}
             <Pagination
               style={{ marginTop: '20px' }}
