@@ -65,39 +65,39 @@ const CodeDecoder = () => {
     console.log(qrCodeLocation);
   }, [qrCodeLocation]);
 
-  useEffect(() => {
-    // Calculate and update the highlight position when qrCodeLocation changes
-    if (cameraWrapperRef.current && qrCodeLocation && isQrDetected) {
-      const cameraWrapper = cameraWrapperRef.current;
-      const cameraWrapperRect = cameraWrapper.getBoundingClientRect();
+  // useEffect(() => {
+  //   // Calculate and update the highlight position when qrCodeLocation changes
+  //   if (cameraWrapperRef.current && qrCodeLocation && isQrDetected) {
+  //     const cameraWrapper = cameraWrapperRef.current;
+  //     const cameraWrapperRect = cameraWrapper.getBoundingClientRect();
 
-      // Calculate center of the detected QR code
-      const qrCodeCenterX = qrCodeLocation.x + qrCodeLocation.width / 2;
-      const qrCodeCenterY = qrCodeLocation.y + qrCodeLocation.height / 2;
+  //     // Calculate center of the detected QR code
+  //     const qrCodeCenterX = qrCodeLocation.x + qrCodeLocation.width / 2;
+  //     const qrCodeCenterY = qrCodeLocation.y + qrCodeLocation.height / 2;
 
-      // Calculate new highlight position to center on the QR code
-      const newHighlightX = qrCodeCenterX - qrCodeLocation.width / 2;
-      const newHighlightY = qrCodeCenterY - qrCodeLocation.height / 2;
+  //     // Calculate new highlight position to center on the QR code
+  //     const newHighlightX = qrCodeCenterX - qrCodeLocation.width / 2;
+  //     const newHighlightY = qrCodeCenterY - qrCodeLocation.height / 2;
 
-      // Ensure highlight stays within the cameraWrapper bounds
-      const maxLeft = Math.max(0, newHighlightX);
-      const maxTop = Math.max(0, newHighlightY);
-      const minRight = Math.min(
-        cameraWrapperRect.width - qrCodeLocation.width,
-        newHighlightX,
-      );
-      const minBottom = Math.min(
-        cameraWrapperRect.height - qrCodeLocation.height,
-        newHighlightY,
-      );
+  //     // Ensure highlight stays within the cameraWrapper bounds
+  //     const maxLeft = Math.max(0, newHighlightX);
+  //     const maxTop = Math.max(0, newHighlightY);
+  //     const minRight = Math.min(
+  //       cameraWrapperRect.width - qrCodeLocation.width,
+  //       newHighlightX,
+  //     );
+  //     const minBottom = Math.min(
+  //       cameraWrapperRect.height - qrCodeLocation.height,
+  //       newHighlightY,
+  //     );
 
-      setQrCodeLocation({
-        ...qrCodeLocation,
-        x: Math.max(maxLeft, minRight),
-        y: Math.max(maxTop, minBottom),
-      });
-    }
-  }, [qrCodeLocation, isQrDetected, cameraWrapperRef, cameraOpenQr]);
+  //     setQrCodeLocation({
+  //       ...qrCodeLocation,
+  //       x: Math.max(maxLeft, minRight),
+  //       y: Math.max(maxTop, minBottom),
+  //     });
+  //   }
+  // }, [qrCodeLocation, isQrDetected, cameraWrapperRef, cameraOpenQr]);
 
   return (
     <div className="App">
