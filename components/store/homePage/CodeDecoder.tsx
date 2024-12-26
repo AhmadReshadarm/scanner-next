@@ -67,12 +67,7 @@ const CodeDecoder = () => {
 
   useEffect(() => {
     // Calculate and update the highlight position when qrCodeLocation changes
-    if (
-      cameraWrapperRef.current &&
-      qrCodeLocation &&
-      isQrDetected &&
-      cameraOpenQr
-    ) {
+    if (cameraWrapperRef.current && qrCodeLocation && isQrDetected) {
       const cameraWrapper = cameraWrapperRef.current;
       const cameraWrapperRect = cameraWrapper.getBoundingClientRect();
 
@@ -136,9 +131,9 @@ const CodeDecoder = () => {
                 setQrCodeLocation(result[0].boundingBox);
                 setQrData(result[0].rawValue);
                 isQrDetected(true);
-                setTimeout(() => {
-                  setCameraOpenQr(false);
-                }, 2000);
+                // setTimeout(() => {
+                //   setCameraOpenQr(false);
+                // }, 2000);
               } else {
                 setQrData('-');
                 isQrDetected(true);
