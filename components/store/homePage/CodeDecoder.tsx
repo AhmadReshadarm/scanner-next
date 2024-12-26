@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { openErrorNotification } from 'common/helpers';
 import { useAppDispatch } from 'redux/hooks';
@@ -67,7 +67,12 @@ const CodeDecoder = () => {
 
   useEffect(() => {
     // Calculate and update the highlight position when qrCodeLocation changes
-    if (cameraWrapperRef.current && qrCodeLocation && isQrDetected) {
+    if (
+      cameraWrapperRef.current &&
+      qrCodeLocation &&
+      isQrDetected &&
+      cameraOpenQr
+    ) {
       const cameraWrapper = cameraWrapperRef.current;
       const cameraWrapperRect = cameraWrapper.getBoundingClientRect();
 
@@ -97,7 +102,7 @@ const CodeDecoder = () => {
         y: Math.max(maxTop, minBottom),
       });
     }
-  }, [qrCodeLocation, isQrDetected, cameraWrapperRef]);
+  }, [qrCodeLocation, isQrDetected, cameraWrapperRef, cameraOpenQr]);
 
   return (
     <div className="App">
