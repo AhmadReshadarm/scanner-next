@@ -30,6 +30,7 @@ const CodeDecoder = () => {
     width: 250,
     height: 250,
   });
+  const cameraWrapperRef = useRef(null);
   const handleScanQrButtonClick = () => {
     if (cameraOpenBar) {
       openErrorNotification('Сначала закройте камеру для штрих-кода.');
@@ -63,6 +64,41 @@ const CodeDecoder = () => {
   useEffect(() => {
     console.log(qrCodeLocation);
   }, [qrCodeLocation]);
+
+  useEffect(() => {
+    // Calculate and update the highlight position when qrCodeLocation changes
+    if (cameraWrapperRef.current && qrCodeLocation && isQrDetected) {
+      const cameraWrapper = cameraWrapperRef.current;
+      const cameraWrapperRect = cameraWrapper.getBoundingClientRect();
+
+      // Calculate center of the detected QR code
+      const qrCodeCenterX = qrCodeLocation.x + qrCodeLocation.width / 2;
+      const qrCodeCenterY = qrCodeLocation.y + qrCodeLocation.height / 2;
+
+      // Calculate new highlight position to center on the QR code
+      const newHighlightX = qrCodeCenterX - qrCodeLocation.width / 2;
+      const newHighlightY = qrCodeCenterY - qrCodeLocation.height / 2;
+
+      // Ensure highlight stays within the cameraWrapper bounds
+      const maxLeft = Math.max(0, newHighlightX);
+      const maxTop = Math.max(0, newHighlightY);
+      const minRight = Math.min(
+        cameraWrapperRect.width - qrCodeLocation.width,
+        newHighlightX,
+      );
+      const minBottom = Math.min(
+        cameraWrapperRect.height - qrCodeLocation.height,
+        newHighlightY,
+      );
+
+      setQrCodeLocation({
+        ...qrCodeLocation,
+        x: Math.max(maxLeft, minRight),
+        y: Math.max(maxTop, minBottom),
+      });
+    }
+  }, [qrCodeLocation, isQrDetected, cameraWrapperRef]);
+
   return (
     <div className="App">
       <h1>Сканер QR-кода и штрих-кода</h1>
@@ -77,40 +113,30 @@ const CodeDecoder = () => {
         </button>
       </div>
 
-      <div className={styles.cameraWrapper}>
+      <div className={styles.cameraWrapper} ref={cameraWrapperRef}>
         <div
           style={{
-            // top: qrCodeLocation.y,
-            // left: qrCodeLocation.x,
+            top: qrCodeLocation.y,
+            left: qrCodeLocation.x,
             width: `${qrCodeLocation.width}px`,
             height: `${qrCodeLocation.height}px`,
-            display: cameraOpenQr ? 'flex' : 'none',
+            display: isQrDetected ? 'flex' : 'none',
           }}
           className={styles.qr_code_highlight}
         />
         {cameraOpenQr && (
-          // <BarcodeScannerComponent
-          //   id="camera-view"
-          //   width={300}
-          //   height={300}
-          //   onUpdate={(err, result) => {
-          //     if (result) {
-          //       setQrData(result.text);
-          //       setCameraOpenQr(false);
-          //     } else {
-          //       setQrData('-');
-          //     }
-          //   }}
-          // />
-
           <Scanner
             onScan={(result) => {
               if (result) {
                 setQrCodeLocation(result[0].boundingBox);
                 setQrData(result[0].rawValue);
-                // setCameraOpenQr(false);
+                isQrDetected(true);
+                setTimeout(() => {
+                  setCameraOpenQr(false);
+                }, 2000);
               } else {
                 setQrData('-');
+                isQrDetected(true);
                 setQrCodeLocation({
                   x: 'auto',
                   y: 'auto',
@@ -121,9 +147,9 @@ const CodeDecoder = () => {
             }}
             onError={handleError}
             constraints={{
-              facingMode: 'environment', // Use the rear camera
-              width: { min: 1, max: 1000 }, // Adjust min/max width based on desired QR code size
-              height: { min: 1, max: 1000 }, // Adjust min/max height based on desired QR code size
+              facingMode: 'environment',
+              width: { min: 1, max: 1000 },
+              height: { min: 1, max: 1000 },
             }}
           />
         )}
@@ -141,17 +167,6 @@ const CodeDecoder = () => {
               }
             }}
           />
-          // <Scanner
-
-          //   onScan={(result) => {
-          //     if (result) {
-          //       setBarData(result[0].rawValue);
-          //       setCameraOpenBar(false);
-          //     } else {
-          //       setBarData('-');
-          //     }
-          //   }}
-          // />
         )}
       </div>
       <div className={styles.scannedCodesWrapper}>
