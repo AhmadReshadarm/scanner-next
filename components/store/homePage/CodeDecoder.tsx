@@ -128,9 +128,10 @@ const CodeDecoder = () => {
           <Scanner
             onScan={(result) => {
               if (result) {
+                isQrDetected(true);
                 setQrCodeLocation(result[0].boundingBox);
                 setQrData(result[0].rawValue);
-                isQrDetected(true);
+
                 // setTimeout(() => {
                 //   setCameraOpenQr(false);
                 // }, 2000);
