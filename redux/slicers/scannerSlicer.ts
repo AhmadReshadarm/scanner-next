@@ -87,6 +87,9 @@ const scannerSlicer = createSlice({
       .addCase(createScanner.pending, handlePending)
       .addCase(createScanner.fulfilled, (state, action) => {
         state.scanner = action.payload;
+        openSuccessNotification(
+          `QR-код сохраняется с ID: ${action.payload.id}`,
+        );
         state.loading = false;
       })
       .addCase(createScanner.rejected, handleError)
@@ -111,7 +114,7 @@ const scannerSlicer = createSlice({
       //removeScanner
       .addCase(removeScanner.pending, handlePending)
       .addCase(removeScanner.fulfilled, (state, action) => {
-        openSuccessNotification(`${action.payload.id} removed`);
+        openSuccessNotification(`${action.payload.qrCode} удаленный`);
         state.loading = false;
       })
       .addCase(removeScanner.rejected, handleError);

@@ -22,6 +22,12 @@ const IndexPage = () => {
     setClient(true);
   }, []);
 
+  useEffect(() => {
+    console.log(loading);
+
+    console.log(scanners);
+  }, [scanners]);
+
   const [visible, setVisible] = useState(false);
   const showOrDontModal = () => {
     setVisible(!visible);
@@ -29,8 +35,11 @@ const IndexPage = () => {
 
   const handleDelete =
     (id: string, dispatch: AppDispatch, setVisible: any) => async () => {
-      setVisible(!visible);
-      dispatch(removeScanner({ id }));
+      const isSaved: any = await dispatch(removeScanner({ id }));
+      if (!isSaved.error) {
+        dispatch(fetchScanners({ limit: 12, offset: 0 }));
+        setVisible(!visible);
+      }
     };
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -46,6 +55,8 @@ const IndexPage = () => {
     dispatch(fetchScanners({ limit: pageSize, offset: page }));
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
+
+  const dummy = [1, 2, 3, 4, 5, 6, 7, 8];
   return (
     <div className={styles.Container}>
       <div className={styles.Wrapper}>
@@ -54,9 +65,42 @@ const IndexPage = () => {
             <div className={styles.scannerWrapper}>
               {isClient && <CodeDecoder />}
             </div>
+            <button
+              onClick={() => dispatch(fetchScanners({ limit: 12, offset: 0 }))}
+            >
+              Обновить данные
+            </button>
 
             {loading ? (
-              <>loading...</>
+              <div className={styles.scannerDataWrapper}>
+                <div className={styles.itemWrapper}>
+                  <p>ID</p>
+                  <p>|</p>
+                  <p>QR-код</p>
+                  <p>|</p>
+                  <p>Штрих-код</p>
+                </div>
+                {dummy.map((data, index) => {
+                  return (
+                    <div key={index} className={styles.itemWrapper}>
+                      <p
+                        className={styles.LoaderMask}
+                        style={{ width: '100%', height: '20px' }}
+                      />
+                      <p>|</p>
+                      <p
+                        className={styles.LoaderMask}
+                        style={{ width: '100%', height: '20px' }}
+                      />
+                      <p>|</p>
+                      <p
+                        className={styles.LoaderMask}
+                        style={{ width: '100%', height: '20px' }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               <div className={styles.scannerDataWrapper}>
                 <div className={styles.itemWrapper}>
@@ -81,19 +125,11 @@ const IndexPage = () => {
                           icon={<DeleteOutlined />}
                           onClick={showOrDontModal}
                         />
-                        <Button
-                          type="default"
-                          shape="circle"
-                          icon={<EditOutlined />}
-                          style={{ marginLeft: '10px' }}
-                          // onClick={
-                          // }
-                        />
+
                         <Modal
                           title="Подтвердите действие."
                           open={visible}
                           onOk={handleDelete(scans.id!, dispatch, setVisible)}
-                          // confirmLoading={isLoading}
                           onCancel={showOrDontModal}
                         >
                           <p>Вы уверены, что хотите удалить {scans.id}?</p>
