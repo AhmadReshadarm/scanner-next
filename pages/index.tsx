@@ -22,12 +22,6 @@ const IndexPage = () => {
     setClient(true);
   }, []);
 
-  useEffect(() => {
-    console.log(loading);
-
-    console.log(scanners);
-  }, [scanners]);
-
   const [visible, setVisible] = useState(false);
   const showOrDontModal = () => {
     setVisible(!visible);
