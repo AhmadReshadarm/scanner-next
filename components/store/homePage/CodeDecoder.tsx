@@ -37,6 +37,7 @@ const CodeDecoder = () => {
       return;
     }
     setCameraOpenQr(!cameraOpenQr);
+    setIsQrDetected(false);
   };
 
   const handleScanBarButtonClick = () => {
@@ -92,14 +93,17 @@ const CodeDecoder = () => {
         />
         {cameraOpenQr && (
           <Scanner
+            allowMultiple={true}
             onScan={(result) => {
               if (result) {
                 setIsQrDetected(true);
-                setQrCodeLocation(result[0].boundingBox);
+                const { x, y, width, height } = result[0].boundingBox;
+                setQrCodeLocation({ x, y, width, height });
                 setQrData(result[0].rawValue);
 
                 setTimeout(() => {
                   setCameraOpenQr(false);
+                  setIsQrDetected(false);
                 }, 2000);
               } else {
                 setQrData('-');
