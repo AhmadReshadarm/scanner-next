@@ -27,8 +27,8 @@ const CodeDecoder = () => {
   const [qrCodeLocation, setQrCodeLocation] = useState({
     x: 'auto',
     y: 'auto',
-    width: 250,
-    height: 250,
+    width: 200,
+    height: 200,
   });
   const cameraWrapperRef = useRef(null);
   const handleScanQrButtonClick = () => {
@@ -114,7 +114,7 @@ const CodeDecoder = () => {
       </div>
 
       <div className={styles.cameraWrapper} ref={cameraWrapperRef}>
-        <div
+        <p
           style={{
             top: qrCodeLocation.y,
             left: qrCodeLocation.x,
@@ -140,8 +140,8 @@ const CodeDecoder = () => {
                 setQrCodeLocation({
                   x: 'auto',
                   y: 'auto',
-                  width: 250,
-                  height: 250,
+                  width: 200,
+                  height: 200,
                 });
               }
             }}

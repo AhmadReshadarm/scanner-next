@@ -51,6 +51,13 @@
   flex-direction: row;
 }
 
+.cameraWrapper div {
+  width: 300px !important;
+  height: 300px !important;
+  top: auto;
+  left: auto;
+}
+
 .actionButtonsWrapper {
   display: flex;
   flex-direction: column;
@@ -99,6 +106,7 @@
   pointer-events: none;
   z-index: 99;
 }
+
 /* laptopL */
 @media (min-width: 1240px) and (max-width: 1550px) {
   .Wrapper {
