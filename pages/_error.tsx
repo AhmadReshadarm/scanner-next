@@ -1,11 +1,10 @@
-import StoreLayout from 'components/store/storeLayout/layouts';
 import Head from 'next/head';
 import styles from '../genral-styles/error.module.css';
 const Error = ({ statusCode }) => {
   return (
     <>
       <Head>
-        <title>Ошибка Сервиса | NBHOZ 500</title>
+        <title>Ошибка Сервиса | Scanner 500</title>
       </Head>
       <div className={styles.Container}>
         <div className={styles.Wrapper}>
@@ -37,6 +36,4 @@ Error.getInitialProps = ({ res, err }) => {
   return { statusCode };
 };
 
-// export default Error;
-Error.PageLayout = StoreLayout;
 export default Error;

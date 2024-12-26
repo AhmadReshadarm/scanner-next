@@ -1,4 +1,3 @@
-import StoreLayout from 'components/store/storeLayout/layouts';
 import Head from 'next/head';
 import { baseUrl } from 'common/constant';
 import styles from '../genral-styles/404.module.css';
@@ -7,7 +6,7 @@ const NotFound = (): JSX.Element => {
   return (
     <>
       <Head>
-        <title>Страница не найдена | NBHOZ 404</title>
+        <title>Страница не найдена | Scanner 404</title>
         <meta
           property="og:image"
           name="og:image"
@@ -30,5 +29,4 @@ const NotFound = (): JSX.Element => {
   );
 };
 
-NotFound.PageLayout = StoreLayout;
 export default NotFound;
