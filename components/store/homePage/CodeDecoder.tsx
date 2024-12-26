@@ -25,8 +25,8 @@ const CodeDecoder = () => {
   const [cameraOpenBar, setCameraOpenBar] = useState(false);
   const [isQrDetected, setIsQrDetected] = useState(false);
   const [qrCodeLocation, setQrCodeLocation] = useState({
-    x: 0,
-    y: 0,
+    x: 'auto',
+    y: 'auto',
     width: 250,
     height: 250,
   });
@@ -80,8 +80,8 @@ const CodeDecoder = () => {
       <div className={styles.cameraWrapper}>
         <div
           style={{
-            top: qrCodeLocation.y,
-            left: qrCodeLocation.x,
+            // top: qrCodeLocation.y,
+            // left: qrCodeLocation.x,
             width: `${qrCodeLocation.width}px`,
             height: `${qrCodeLocation.height}px`,
             display: cameraOpenQr ? 'flex' : 'none',
@@ -111,7 +111,12 @@ const CodeDecoder = () => {
                 // setCameraOpenQr(false);
               } else {
                 setQrData('-');
-                setQrCodeLocation({ x: 0, y: 0, width: 250, height: 250 });
+                setQrCodeLocation({
+                  x: 'auto',
+                  y: 'auto',
+                  width: 250,
+                  height: 250,
+                });
               }
             }}
             onError={handleError}
