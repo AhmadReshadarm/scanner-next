@@ -96,6 +96,9 @@ const CodeDecoder = () => {
         <button onClick={handleByScannerButtonClick}>
           {byScanner ? 'Использовать камеру' : 'Использовать сканер'}
         </button>
+        <a href="/qrcodes">
+          <button>Перейти к QR-кодам</button>
+        </a>
       </div>
 
       {byScanner ? (

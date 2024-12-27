@@ -73,7 +73,7 @@ const ScannedQrcodeScanned = () => {
           </div>
         </div>
 
-        <button onClick={getImage}>Получать Скриншот</button>
+        <button onClick={getImage}>Получить изображение QR-кода</button>
         <img
           style={{ border: '1px solid', padding: '10px', borderRadius: '5px' }}
           src={image}
@@ -87,6 +87,9 @@ const ScannedQrcodeScanned = () => {
     <div className={styles.Container}>
       <div className={styles.Wrapper}>
         <div className={styles.Content}>
+          <a href="/">
+            <button>Перейти к сканеру</button>
+          </a>
           <div className={styles.scannerDataWrapper}>
             {!loading ? (
               scanners.map((data, index) => {
