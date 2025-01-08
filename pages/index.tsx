@@ -38,6 +38,7 @@ const IndexPage = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize]: [number, any] = useState(12);
+  const PAGE_ITEMS_LIMIT = 12;
   const handlePageChange = (
     page: number,
     pageSize: number,
@@ -46,7 +47,13 @@ const IndexPage = () => {
   ) => {
     setPageSize(pageSize);
     setCurrentPage(current);
-    dispatch(fetchScanners({ limit: pageSize, offset: page }));
+
+    dispatch(
+      fetchScanners({
+        limit: pageSize,
+        offset: Number(pageSize ?? PAGE_ITEMS_LIMIT) * (Number(page ?? 1) - 1),
+      }),
+    );
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 

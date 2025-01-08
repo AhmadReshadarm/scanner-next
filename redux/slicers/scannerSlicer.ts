@@ -25,9 +25,9 @@ export const fetchScanners = createAsyncThunk<
   { rejectValue: string }
 >(
   'scanner/fetchScanners',
-  async function (_, { rejectWithValue }): Promise<any> {
+  async function (payload, { rejectWithValue }): Promise<any> {
     try {
-      const response = await ScannerService.getScanners();
+      const response = await ScannerService.getScanners(payload);
       return response;
     } catch (error: any) {
       return rejectWithValue(getErrorMassage(error.response.status));
