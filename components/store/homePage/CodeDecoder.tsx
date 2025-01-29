@@ -166,6 +166,7 @@ const CodeDecoder = () => {
               onError={handleError}
               constraints={{
                 facingMode: 'environment',
+                advanced: [{ focuseMode: 'continuous' }, { zoom: '1.5' }],
                 width: { min: 1, max: 1000 },
                 height: { min: 1, max: 1000 },
               }}
@@ -174,6 +175,10 @@ const CodeDecoder = () => {
           {cameraOpenBar && (
             <BarcodeScannerComponent
               id="camera-view"
+              videoConstraints={{
+                facingMode: 'enviroment',
+                advanced: [{ focuseMode: 'continuous' }, { zoom: '1.5' }],
+              }}
               width={300}
               height={300}
               onUpdate={(err, result) => {
