@@ -5,7 +5,6 @@ import { openErrorNotification } from 'common/helpers';
 import { useAppDispatch } from 'redux/hooks';
 import { createScanner, fetchScanners } from 'redux/slicers/scannerSlicer';
 import styles from './styles/main.module.css';
-import BarcodeScanner from './barcodeScanner';
 const BarcodeScannerComponent = dynamic(
   () => import('react-qr-barcode-scanner'),
   {
@@ -72,6 +71,7 @@ const CodeDecoder = () => {
   const handleError = (error) => {
     console.error(error);
   };
+  const nextInput = useRef(null);
 
   return (
     <div className={styles.ScannerContainer}>
@@ -191,7 +191,6 @@ const CodeDecoder = () => {
               }}
             />
           )}
-          {/* <BarcodeScanner /> */}
         </div>
       )}
       <div className={styles.scannedCodesWrapper}>
