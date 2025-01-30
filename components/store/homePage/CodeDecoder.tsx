@@ -73,6 +73,32 @@ const CodeDecoder = () => {
   };
   const nextInput = useRef(null);
 
+  useEffect(() => {
+    if (cameraOpenBar) {
+      (async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: {
+              ideal: 'environment',
+            },
+          },
+          audio: false,
+        });
+        const videoEl = document.querySelector('#stream');
+        videoEl.srcObject = stream;
+        await videoEl.play();
+
+        const barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
+        window.setInterval(async () => {
+          const barcodes = await barcodeDetector.detect(videoEl);
+          if (barcodes.length <= 0) return;
+          // alert(barcodes.map((barcode) => barcode.rawValue));
+          setBarData(barcodes.map((barcode) => barcode.rawValue));
+        }, 1000);
+      })();
+    }
+  }, [cameraOpenBar]);
+
   return (
     <div className={styles.ScannerContainer}>
       <h1>Сканер QR-кода и штрих-кода</h1>
@@ -173,23 +199,24 @@ const CodeDecoder = () => {
             />
           )}
           {cameraOpenBar && (
-            <BarcodeScannerComponent
-              id="camera-view"
-              videoConstraints={{
-                facingMode: 'enviroment',
-                advanced: [{ focuseMode: 'continuous' }, { zoom: '1.5' }],
-              }}
-              width={300}
-              height={300}
-              onUpdate={(err, result) => {
-                if (result) {
-                  setBarData(result.text);
-                  setCameraOpenBar(false);
-                } else {
-                  setBarData('');
-                }
-              }}
-            />
+            // <BarcodeScannerComponent
+            //   id="camera-view"
+            //   videoConstraints={{
+            //     facingMode: 'enviroment',
+            //     advanced: [{ focuseMode: 'continuous' }, { zoom: '1.5' }],
+            //   }}
+            //   width={300}
+            //   height={300}
+            //   onUpdate={(err, result) => {
+            //     if (result) {
+            //       setBarData(result.text);
+            //       setCameraOpenBar(false);
+            //     } else {
+            //       setBarData('');
+            //     }
+            //   }}
+            // />
+            <video id="stream" style="width: 300px; height: 300px;" />
           )}
         </div>
       )}
