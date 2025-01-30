@@ -5,6 +5,7 @@ import { openErrorNotification } from 'common/helpers';
 import { useAppDispatch } from 'redux/hooks';
 import { createScanner, fetchScanners } from 'redux/slicers/scannerSlicer';
 import styles from './styles/main.module.css';
+import BarcodeScanner from './barcodeScanner';
 const BarcodeScannerComponent = dynamic(
   () => import('react-qr-barcode-scanner'),
   {
@@ -243,7 +244,7 @@ const CodeDecoder = () => {
               }}
             />
           )}
-          {cameraOpenBar && (
+          {/* {cameraOpenBar && (
             // <BarcodeScannerComponent
             //   id="camera-view"
             //   videoConstraints={{
@@ -262,7 +263,8 @@ const CodeDecoder = () => {
             //   }}
             // />
             <video ref={videoRef} autoPlay playsInline muted />
-          )}
+          )} */}
+          <BarcodeScanner />
         </div>
       )}
       <div className={styles.scannedCodesWrapper}>
