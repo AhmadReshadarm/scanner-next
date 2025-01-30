@@ -72,78 +72,6 @@ const CodeDecoder = () => {
   const handleError = (error) => {
     console.error(error);
   };
-  const nextInput = useRef(null);
-  const videoRef = useRef(null);
-  const detectionInterval = useRef(null);
-  const isMounted = useRef(true); // Track component mount state
-
-  useEffect(() => {
-    if (cameraOpenBar) {
-      // Initialize BarcodeDetector if supported
-      let detector;
-      if (window.BarcodeDetector) {
-        detector = new BarcodeDetector({
-          formats: ['qr_code', 'ean_13', 'code_128'],
-        });
-      } else {
-        console.warn('Barcode Detection API is not supported in this browser.');
-        return;
-      }
-
-      // Start camera feed
-      const startCamera = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({
-            video: {
-              facingMode: { ideal: 'environment' },
-              advanced: [{ focuseMode: 'continuous' }],
-            },
-          });
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-
-          // Start barcode detection loop
-          detectionInterval.current = setInterval(async () => {
-            if (
-              !videoRef.current ||
-              videoRef.current.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA
-            ) {
-              return;
-            }
-
-            try {
-              const barcodes = await detector.detect(videoRef.current);
-              if (barcodes.length > 0) {
-                // Found a barcode - stop everything
-                clearInterval(detectionInterval.current);
-                stream.getTracks().forEach((track) => track.stop());
-                setBarData(barcodes[0].rawValue);
-              }
-            } catch (error) {
-              console.error('Detection error:', error);
-            }
-          }, 500);
-        } catch (error) {
-          console.error('Error accessing camera:', error);
-        }
-      };
-
-      startCamera();
-
-      // Cleanup on unmount
-      return () => {
-        isMounted.current = false;
-        if (detectionInterval.current) {
-          clearInterval(detectionInterval.current);
-        }
-        if (videoRef.current?.srcObject) {
-          const tracks = videoRef.current.srcObject.getTracks();
-          tracks.forEach((track) => track.stop());
-        }
-      };
-    }
-  }, [cameraOpenBar]);
 
   return (
     <div className={styles.ScannerContainer}>
@@ -244,27 +172,26 @@ const CodeDecoder = () => {
               }}
             />
           )}
-          {/* {cameraOpenBar && (
-            // <BarcodeScannerComponent
-            //   id="camera-view"
-            //   videoConstraints={{
-            //     facingMode: 'enviroment',
-            //     advanced: [{ focuseMode: 'continuous' }, { zoom: '1.5' }],
-            //   }}
-            //   width={300}
-            //   height={300}
-            //   onUpdate={(err, result) => {
-            //     if (result) {
-            //       setBarData(result.text);
-            //       setCameraOpenBar(false);
-            //     } else {
-            //       setBarData('');
-            //     }
-            //   }}
-            // />
-            <video ref={videoRef} autoPlay playsInline muted />
-          )} */}
-          <BarcodeScanner />
+          {cameraOpenBar && (
+            <BarcodeScannerComponent
+              id="camera-view"
+              videoConstraints={{
+                facingMode: 'enviroment',
+                advanced: [{ focuseMode: 'continuous' }, { zoom: '1.5' }],
+              }}
+              width={300}
+              height={300}
+              onUpdate={(err, result) => {
+                if (result) {
+                  setBarData(result.text);
+                  setCameraOpenBar(false);
+                } else {
+                  setBarData('');
+                }
+              }}
+            />
+          )}
+          {/* <BarcodeScanner /> */}
         </div>
       )}
       <div className={styles.scannedCodesWrapper}>
