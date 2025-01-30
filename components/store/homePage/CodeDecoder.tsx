@@ -93,7 +93,10 @@ const CodeDecoder = () => {
       const startCamera = async () => {
         try {
           const stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
+            video: {
+              facingMode: { ideal: 'environment' },
+              advanced: [{ focuseMode: 'continuous' }],
+            },
           });
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
@@ -109,14 +112,17 @@ const CodeDecoder = () => {
             }
 
             try {
-              const detectedBarcodes = await detector.detect(videoRef.current);
-              if (isMounted.current) {
-                setBarData(detectedBarcodes);
+              const barcodes = await detector.detect(videoRef.current);
+              if (barcodes.length > 0) {
+                // Found a barcode - stop everything
+                clearInterval(detectionInterval.current);
+                stream.getTracks().forEach((track) => track.stop());
+                setBarData(barcodes[0].rawValue);
               }
             } catch (error) {
-              console.error('Barcode detection failed:', error);
+              console.error('Detection error:', error);
             }
-          }, 500); // Adjust detection frequency (e.g., 500ms)
+          }, 500);
         } catch (error) {
           console.error('Error accessing camera:', error);
         }
