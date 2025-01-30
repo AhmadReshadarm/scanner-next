@@ -72,30 +72,69 @@ const CodeDecoder = () => {
     console.error(error);
   };
   const nextInput = useRef(null);
+  const videoRef = useRef(null);
+  const detectionInterval = useRef(null);
+  const isMounted = useRef(true); // Track component mount state
 
   useEffect(() => {
     if (cameraOpenBar) {
-      (async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: {
-              ideal: 'environment',
-            },
-          },
-          audio: false,
+      // Initialize BarcodeDetector if supported
+      let detector;
+      if (window.BarcodeDetector) {
+        detector = new BarcodeDetector({
+          formats: ['qr_code', 'ean_13', 'code_128'],
         });
-        const videoEl = document.querySelector('#stream');
-        videoEl.srcObject = stream;
-        await videoEl.play();
+      } else {
+        console.warn('Barcode Detection API is not supported in this browser.');
+        return;
+      }
 
-        const barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
-        window.setInterval(async () => {
-          const barcodes = await barcodeDetector.detect(videoEl);
-          if (barcodes.length <= 0) return;
-          // alert(barcodes.map((barcode) => barcode.rawValue));
-          setBarData(barcodes.map((barcode) => barcode.rawValue));
-        }, 1000);
-      })();
+      // Start camera feed
+      const startCamera = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+          });
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+
+          // Start barcode detection loop
+          detectionInterval.current = setInterval(async () => {
+            if (
+              !videoRef.current ||
+              videoRef.current.readyState < HTMLMediaElement.HAVE_ENOUGH_DATA
+            ) {
+              return;
+            }
+
+            try {
+              const detectedBarcodes = await detector.detect(videoRef.current);
+              if (isMounted.current) {
+                setBarData(detectedBarcodes);
+              }
+            } catch (error) {
+              console.error('Barcode detection failed:', error);
+            }
+          }, 500); // Adjust detection frequency (e.g., 500ms)
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+        }
+      };
+
+      startCamera();
+
+      // Cleanup on unmount
+      return () => {
+        isMounted.current = false;
+        if (detectionInterval.current) {
+          clearInterval(detectionInterval.current);
+        }
+        if (videoRef.current?.srcObject) {
+          const tracks = videoRef.current.srcObject.getTracks();
+          tracks.forEach((track) => track.stop());
+        }
+      };
     }
   }, [cameraOpenBar]);
 
@@ -216,7 +255,7 @@ const CodeDecoder = () => {
             //     }
             //   }}
             // />
-            <video id="stream" style="width: 300px; height: 300px;" />
+            <video ref={videoRef} autoPlay playsInline muted />
           )}
         </div>
       )}
