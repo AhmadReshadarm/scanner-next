@@ -5,6 +5,7 @@ import { openErrorNotification } from 'common/helpers';
 import { useAppDispatch } from 'redux/hooks';
 import { createScanner, fetchScanners } from 'redux/slicers/scannerSlicer';
 import styles from './styles/main.module.css';
+import { Tag } from 'swagger/services';
 const BarcodeScannerComponent = dynamic(
   () => import('react-qr-barcode-scanner'),
   {
@@ -14,8 +15,16 @@ const BarcodeScannerComponent = dynamic(
 const Scanner = dynamic(() =>
   import('@yudiel/react-qr-scanner').then((mod) => mod.Scanner),
 );
-
-const CodeDecoder = () => {
+type Props = {
+  tags: Tag[];
+  selectedDatabase: string;
+  setSelectedDatabase: any;
+};
+const CodeDecoder: React.FC<Props> = ({
+  tags,
+  selectedDatabase,
+  setSelectedDatabase,
+}) => {
   const dispatch = useAppDispatch();
 
   const [qrData, setQrData] = useState('');
@@ -54,14 +63,19 @@ const CodeDecoder = () => {
   };
 
   const handleScanUpload = () => {
-    if (qrData !== '' && barData !== '') {
+    if (qrData !== '' && barData !== '' && selectedDatabase !== '') {
       const isSaved: any = dispatch(
-        createScanner({ id: '', qrCode: qrData, barCode: barData }),
+        createScanner({
+          id: '',
+          qrCode: qrData,
+          barCode: barData,
+          tags: [selectedDatabase],
+        }),
       );
       if (!isSaved.error) {
         setQrData('');
         setBarData('');
-        dispatch(fetchScanners({ limit: 12, offset: 0 }));
+        dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
       }
     } else {
       openErrorNotification('Сканировать QR-код и штрих-код');
@@ -194,6 +208,19 @@ const CodeDecoder = () => {
         </div>
       )}
       <div className={styles.scannedCodesWrapper}>
+        <div className={styles.options_container}>
+          <h1>выберите базу данных</h1>
+          <select
+            className={styles.option_wrapper}
+            onChange={(evt) => {
+              setSelectedDatabase(evt.target.value);
+            }}
+          >
+            {tags.map((tag) => {
+              return <option value={tag.id}>{tag.name}</option>;
+            })}
+          </select>
+        </div>
         <div className={styles.qrCodeScannerWrapper}>
           <p>QR-код: </p>
           <p>{qrData}</p>

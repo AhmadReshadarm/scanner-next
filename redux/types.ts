@@ -367,6 +367,7 @@ type TProfileState = {
 type TScannerPayload = {
   id?: string;
   qrCode?: string;
+  tags?: string[];
   sortBy?: 'id';
   orderBy?: 'DESC' | 'ASC';
   limit?: number;

@@ -6,21 +6,34 @@ import styles from '../components/store/homePage/styles/main.module.css';
 import CodeDecoder from 'components/store/homePage/CodeDecoder';
 import { Button, Modal } from 'antd';
 import Pagination from 'antd/es/pagination';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import { AppDispatch } from 'redux/store';
+import { clearTags, fetchTags } from 'redux/slicers/tagsSlicer';
+import { basicRequestParams } from 'common/constants';
 // ---------------------------------------------------------------------------------------
 const IndexPage = () => {
   const [isClient, setClient] = useState(false);
+
   const dispatch = useAppDispatch();
   const { scanners, length, loading } = useAppSelector<TScanner>(
     (state) => state.scanner,
   );
+  const tags = useAppSelector((state) => state.tags.tags);
+  const [selectedDatabase, setSelectedDatabase] = useState('');
+  useEffect(() => {
+    dispatch(fetchTags(basicRequestParams));
+    setClient(true);
+    return () => {
+      dispatch(clearTags());
+    };
+  }, []);
 
   useEffect(() => {
-    dispatch(fetchScanners({ limit: 12, offset: 0 }));
-
-    setClient(true);
-  }, []);
+    if (tags.length) {
+      setSelectedDatabase(tags[0].url);
+      dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
+    }
+  }, [tags]);
 
   const [visible, setVisible] = useState(false);
   const showOrDontModal = () => {
@@ -31,7 +44,7 @@ const IndexPage = () => {
     (id: string, dispatch: AppDispatch, setVisible: any) => async () => {
       const isSaved: any = await dispatch(removeScanner({ id }));
       if (!isSaved.error) {
-        dispatch(fetchScanners({ limit: 12, offset: 0 }));
+        dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
         setVisible(!visible);
       }
     };
@@ -58,20 +71,49 @@ const IndexPage = () => {
   };
 
   const dummy = [1, 2, 3, 4, 5, 6, 7, 8];
+
   return (
     <div className={styles.Container}>
       <div className={styles.Wrapper}>
         <div className={styles.Content}>
           <div className={styles.CodesWrapper}>
             <div className={styles.scannerWrapper}>
-              {isClient && <CodeDecoder />}
+              {isClient && (
+                <CodeDecoder
+                  tags={tags}
+                  selectedDatabase={selectedDatabase}
+                  setSelectedDatabase={setSelectedDatabase}
+                />
+              )}
             </div>
             <button
-              onClick={() => dispatch(fetchScanners({ limit: 12, offset: 0 }))}
+              onClick={() =>
+                dispatch(
+                  fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }),
+                )
+              }
             >
               Обновить данные
             </button>
-
+            <div className={styles.options_container}>
+              <h1>выберите базу данных</h1>
+              <select
+                className={styles.option_wrapper}
+                onChange={(evt) => {
+                  dispatch(
+                    fetchScanners({
+                      limit: 12,
+                      offset: 0,
+                      tags: [evt.target.value],
+                    }),
+                  );
+                }}
+              >
+                {tags.map((tag) => {
+                  return <option value={tag.url}>{tag.name}</option>;
+                })}
+              </select>
+            </div>
             {loading ? (
               <div className={styles.scannerDataWrapper}>
                 <div className={styles.itemWrapper}>

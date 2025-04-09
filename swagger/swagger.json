@@ -6246,6 +6246,16 @@
         "produces": ["application/json"],
         "parameters": [
           {
+            "name": "tags",
+            "in": "query",
+            "description": "Filtering scans by tags URLs in array",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
             "name": "sortBy",
             "in": "query",
             "description": "Sorting scanners by property",
@@ -8533,6 +8543,12 @@
         },
         "barCode": {
           "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Tag"
+          }
         }
       }
     },
