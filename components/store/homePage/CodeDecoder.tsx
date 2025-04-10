@@ -113,6 +113,9 @@ const CodeDecoder: React.FC<Props> = ({
         <a href="/qrcodes">
           <button>Перейти к QR-кодам</button>
         </a>
+        <a href="/create-tag">
+          <button>Создать базу данных</button>
+        </a>
       </div>
 
       {byScanner ? (
@@ -144,8 +147,6 @@ const CodeDecoder: React.FC<Props> = ({
         <div className={styles.cameraWrapper} ref={cameraWrapperRef}>
           <p
             style={{
-              // top: qrCodeLocation.y,
-              // left: qrCodeLocation.x,
               width: `${qrCodeLocation.width}px`,
               height: `${qrCodeLocation.height}px`,
               display: isQrDetected ? 'flex' : 'none',
@@ -209,7 +210,7 @@ const CodeDecoder: React.FC<Props> = ({
       )}
       <div className={styles.scannedCodesWrapper}>
         <div className={styles.options_container}>
-          <h1>выберите базу данных</h1>
+          <h1>Выберите базу данных для сохранения данных</h1>
           <select
             className={styles.option_wrapper}
             onChange={(evt) => {

@@ -10,10 +10,11 @@ import Pagination from 'antd/es/pagination';
 import { AppDispatch } from 'redux/store';
 import { clearTags, fetchTags } from 'redux/slicers/tagsSlicer';
 import { basicRequestParams } from 'common/constants';
+import { Tag } from 'swagger/services';
 
 const ScannedQrcodeScanned = () => {
   const dispatch = useAppDispatch();
-  const tags = useAppSelector((state) => state.tags.tags);
+  const tags: Tag[] = useAppSelector((state) => state.tags.tags);
   useEffect(() => {
     dispatch(fetchTags(basicRequestParams));
     return () => {
@@ -30,7 +31,7 @@ const ScannedQrcodeScanned = () => {
 
   useEffect(() => {
     if (tags.length) {
-      dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
+      dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url!] }));
     }
   }, [tags]);
 
@@ -78,7 +79,7 @@ const ScannedQrcodeScanned = () => {
       await waitForImageLoad(imageContainers[index]);
 
       // Trigger download
-      await triggerDownload(imageContainers[index]);
+      await triggerDownload(imageContainers[index], scanners[index].barCode!);
 
       // Process next image
       await downloadImagesRecursively(index + 1);
@@ -104,13 +105,13 @@ const ScannedQrcodeScanned = () => {
   };
 
   // Helper function to trigger download
-  const triggerDownload = (container: Element) => {
+  const triggerDownload = (container: Element, imageString: string) => {
     return new Promise<void>((resolve) => {
       const img = container.querySelector('img');
       if (img && img.src) {
         const link = document.createElement('a');
         link.href = img.src;
-        link.download = `QR_${Date.now()}.png`;
+        link.download = `QR_${imageString}.png`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -179,7 +180,7 @@ const ScannedQrcodeScanned = () => {
       <div className={styles.Wrapper}>
         <div className={styles.Content}>
           <button onClick={handleDownloadAll} style={{ margin: '10px 0' }}>
-            Download All Images
+            Скачать {tags.length - 1} изображений
           </button>
           <a href="/">
             <button>Перейти к сканеру</button>

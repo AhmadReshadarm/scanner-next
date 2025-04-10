@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { fetchScanners, removeScanner } from 'redux/slicers/scannerSlicer';
+import {
+  fetchScanners,
+  removeScanner,
+  updateScanner,
+} from 'redux/slicers/scannerSlicer';
 import { TScanner } from 'redux/types';
 import styles from '../components/store/homePage/styles/main.module.css';
 import CodeDecoder from 'components/store/homePage/CodeDecoder';
@@ -10,6 +14,8 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { AppDispatch } from 'redux/store';
 import { clearTags, fetchTags } from 'redux/slicers/tagsSlicer';
 import { basicRequestParams } from 'common/constants';
+import { openErrorNotification } from 'common/helpers';
+import { Scanner } from 'swagger/services';
 // ---------------------------------------------------------------------------------------
 const IndexPage = () => {
   const [isClient, setClient] = useState(false);
@@ -20,6 +26,7 @@ const IndexPage = () => {
   );
   const tags = useAppSelector((state) => state.tags.tags);
   const [selectedDatabase, setSelectedDatabase] = useState('');
+  const [selectedDatabaseURL, setSelectedDatabaseURL] = useState('');
   useEffect(() => {
     dispatch(fetchTags(basicRequestParams));
     setClient(true);
@@ -29,8 +36,9 @@ const IndexPage = () => {
   }, []);
 
   useEffect(() => {
-    if (tags.length) {
+    if (tags.length !== 0) {
       setSelectedDatabase(tags[0].url);
+      setSelectedDatabaseURL(tags[0].url);
       dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
     }
   }, [tags]);
@@ -44,7 +52,9 @@ const IndexPage = () => {
     (id: string, dispatch: AppDispatch, setVisible: any) => async () => {
       const isSaved: any = await dispatch(removeScanner({ id }));
       if (!isSaved.error) {
-        dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
+        dispatch(
+          fetchScanners({ limit: 12, offset: 0, tags: [selectedDatabaseURL] }),
+        );
         setVisible(!visible);
       }
     };
@@ -65,12 +75,40 @@ const IndexPage = () => {
       fetchScanners({
         limit: pageSize,
         offset: Number(pageSize ?? PAGE_ITEMS_LIMIT) * (Number(page ?? 1) - 1),
+        tags: [selectedDatabaseURL],
       }),
     );
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
   const dummy = [1, 2, 3, 4, 5, 6, 7, 8];
+  // const [loadingPercent, setLoadingPercent] = useState(0);
+  // const fixData = async () => {
+  //   const fixDataRecursively = async (index: number) => {
+  //     if (index >= scanners.length) {
+  //       setLoadingPercent(0);
+  //       return;
+  //     }
+  //     console.log(scanners[index]);
+
+  //     const isSaved: any = await dispatch(
+  //       updateScanner({
+  //         id: scanners[index].id,
+  //         barCode: scanners[index].barCode,
+  //         qrCode: scanners[index].qrCode,
+  //         tags: [tags[1].id],
+  //       }),
+  //     );
+  //     if (isSaved.error) {
+  //       openErrorNotification(`error in id: ${scanners[index].id}`);
+  //       dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
+  //       return;
+  //     }
+  //     setLoadingPercent(Math.floor((index * 100) / scanners.length));
+  //     fixDataRecursively(index + 1);
+  //   };
+  //   fixDataRecursively(0);
+  // };
 
   return (
     <div className={styles.Container}>
@@ -95,11 +133,26 @@ const IndexPage = () => {
             >
               Обновить данные
             </button>
+            {/* <button
+              onClick={() => {
+                dispatch(fetchScanners({ limit: 12, offset: 0 }));
+              }}
+            >
+              loadData
+            </button>
+            <button
+              onClick={() => {
+                fixData();
+              }}
+            >
+              {loadingPercent !== 0 ? `fixing ${loadingPercent}%` : 'fix data'}
+            </button> */}
             <div className={styles.options_container}>
               <h1>выберите базу данных</h1>
               <select
                 className={styles.option_wrapper}
                 onChange={(evt) => {
+                  setSelectedDatabaseURL(evt.target.value);
                   dispatch(
                     fetchScanners({
                       limit: 12,
