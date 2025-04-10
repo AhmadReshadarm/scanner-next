@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import {
-  fetchScanners,
-  removeScanner,
-  updateScanner,
-} from 'redux/slicers/scannerSlicer';
+import { fetchScanners, removeScanner } from 'redux/slicers/scannerSlicer';
 import { TScanner } from 'redux/types';
 import styles from '../components/store/homePage/styles/main.module.css';
 import CodeDecoder from 'components/store/homePage/CodeDecoder';
@@ -14,8 +10,7 @@ import { DeleteOutlined } from '@ant-design/icons';
 import { AppDispatch } from 'redux/store';
 import { clearTags, fetchTags } from 'redux/slicers/tagsSlicer';
 import { basicRequestParams } from 'common/constants';
-import { openErrorNotification } from 'common/helpers';
-import { Scanner } from 'swagger/services';
+
 // ---------------------------------------------------------------------------------------
 const IndexPage = () => {
   const [isClient, setClient] = useState(false);
@@ -37,9 +32,15 @@ const IndexPage = () => {
 
   useEffect(() => {
     if (tags.length !== 0) {
-      setSelectedDatabase(tags[0].url);
+      setSelectedDatabase(tags[0].id);
       setSelectedDatabaseURL(tags[0].url);
-      dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
+      dispatch(
+        fetchScanners({
+          limit: 12,
+          offset: 0,
+          tags: [tags[tags.length - 1].url],
+        }),
+      );
     }
   }, [tags]);
 
@@ -126,7 +127,11 @@ const IndexPage = () => {
             <button
               onClick={() =>
                 dispatch(
-                  fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }),
+                  fetchScanners({
+                    limit: 12,
+                    offset: 0,
+                    tags: [selectedDatabaseURL],
+                  }),
                 )
               }
             >
@@ -152,17 +157,24 @@ const IndexPage = () => {
                 className={styles.option_wrapper}
                 onChange={(evt) => {
                   setSelectedDatabaseURL(evt.target.value);
-                  dispatch(
-                    fetchScanners({
-                      limit: 12,
-                      offset: 0,
-                      tags: [evt.target.value],
-                    }),
-                  );
+                  const payload = {
+                    limit: 12,
+                    offset: 0,
+                    tags: [evt.target.value],
+                  };
+                  dispatch(fetchScanners(payload));
                 }}
               >
-                {tags.map((tag) => {
-                  return <option value={tag.url}>{tag.name}</option>;
+                {tags.map((tag, index) => {
+                  return (
+                    <option
+                      key={index}
+                      value={tag.url}
+                      selected={tags.length - 1 == index ? true : false}
+                    >
+                      {tag.name}
+                    </option>
+                  );
                 })}
               </select>
             </div>

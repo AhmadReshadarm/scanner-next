@@ -111,17 +111,12 @@ const scannerSlicer = createSlice({
         localStorage.removeItem('wishlistId');
       })
       //updateScanner
-      .addCase(updateScanner.pending, (state) => {
-        state.updatingLoading = true;
-      })
+      .addCase(updateScanner.pending, handlePending)
       .addCase(updateScanner.fulfilled, (state, action) => {
         state.scanner = action.payload;
-        state.updatingLoading = false;
+        state.loading = false;
       })
-      .addCase(updateScanner.rejected, (state, action) => {
-        state.updatingLoading = false;
-        openErrorNotification(action.payload!);
-      })
+      .addCase(updateScanner.rejected, handleError)
       //removeScanner
       .addCase(removeScanner.pending, handlePending)
       .addCase(removeScanner.fulfilled, (state, action) => {
