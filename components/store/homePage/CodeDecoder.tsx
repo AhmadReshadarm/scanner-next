@@ -114,7 +114,7 @@ const CodeDecoder: React.FC<Props> = ({
           <button>Перейти к QR-кодам</button>
         </a>
         <a href="/create-tag">
-          <button>Создать базу данных</button>
+          <button>Создать новую базу данных</button>
         </a>
       </div>
 

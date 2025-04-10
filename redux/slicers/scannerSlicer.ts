@@ -1,5 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { getErrorMassage, handleError, handlePending } from 'common/helpers';
+import {
+  getErrorMassage,
+  handleError,
+  handlePending,
+  openErrorNotification,
+} from 'common/helpers';
 import { openSuccessNotification } from 'common/helpers/openSuccessNotidication.helper';
 import { TScanner, TScannerPayload } from 'redux/types';
 import { Scanner, ScannerService } from 'swagger/services';
@@ -75,6 +80,7 @@ const initialState: TScanner = {
   scanners: [],
   length: 0,
   loading: false,
+  updatingLoading: false,
 };
 
 const scannerSlicer = createSlice({
@@ -105,12 +111,17 @@ const scannerSlicer = createSlice({
         localStorage.removeItem('wishlistId');
       })
       //updateScanner
-      .addCase(updateScanner.pending, handlePending)
+      .addCase(updateScanner.pending, (state) => {
+        state.updatingLoading = true;
+      })
       .addCase(updateScanner.fulfilled, (state, action) => {
         state.scanner = action.payload;
-        state.loading = false;
+        state.updatingLoading = false;
       })
-      .addCase(updateScanner.rejected, handleError)
+      .addCase(updateScanner.rejected, (state, action) => {
+        state.updatingLoading = false;
+        openErrorNotification(action.payload!);
+      })
       //removeScanner
       .addCase(removeScanner.pending, handlePending)
       .addCase(removeScanner.fulfilled, (state, action) => {

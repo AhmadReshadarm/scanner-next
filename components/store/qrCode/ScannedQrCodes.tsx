@@ -15,6 +15,7 @@ import { Tag } from 'swagger/services';
 const ScannedQrcodeScanned = () => {
   const dispatch = useAppDispatch();
   const tags: Tag[] = useAppSelector((state) => state.tags.tags);
+  const [selectedDatabaseURL, setSelectedDatabaseURL] = useState('');
   useEffect(() => {
     dispatch(fetchTags(basicRequestParams));
     return () => {
@@ -25,12 +26,9 @@ const ScannedQrcodeScanned = () => {
     (state) => state.scanner,
   );
 
-  // useEffect(() => {
-  //   dispatch(fetchScanners({ limit: 12, offset: 0 }));
-  // }, []);
-
   useEffect(() => {
-    if (tags.length) {
+    if (tags.length !== 0) {
+      setSelectedDatabaseURL(tags[0].url!);
       dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url!] }));
     }
   }, [tags]);
@@ -50,6 +48,7 @@ const ScannedQrcodeScanned = () => {
       fetchScanners({
         limit: pageSize,
         offset: Number(pageSize ?? PAGE_ITEMS_LIMIT) * (Number(page ?? 1) - 1),
+        tags: [selectedDatabaseURL],
       }),
     );
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
@@ -121,7 +120,7 @@ const ScannedQrcodeScanned = () => {
   };
 
   // -----------------------------------------------------------
-
+  const dummy = [1, 2, 3, 4, 5, 6, 7, 8];
   const Cards = ({ data }) => {
     const ref = useRef(null);
     const [image, takeScreenshot] = useScreenshot();
@@ -180,7 +179,7 @@ const ScannedQrcodeScanned = () => {
       <div className={styles.Wrapper}>
         <div className={styles.Content}>
           <button onClick={handleDownloadAll} style={{ margin: '10px 0' }}>
-            Скачать {tags.length - 1} изображений
+            Скачать {scanners.length} изображений
           </button>
           <a href="/">
             <button>Перейти к сканеру</button>
@@ -205,17 +204,39 @@ const ScannedQrcodeScanned = () => {
             </select>
           </div>
           <div className={styles.scannerDataWrapper}>
-            {!loading ? (
-              scanners.map((data, index) => {
-                return (
-                  <div key={index} className={styles.codeContainer}>
-                    <Cards data={data} />
-                  </div>
-                );
-              })
-            ) : (
-              <>loading...</>
-            )}
+            {!loading
+              ? scanners.map((data, index) => {
+                  return (
+                    <div key={index} className={styles.codeContainer}>
+                      <Cards data={data} />
+                    </div>
+                  );
+                })
+              : dummy.map(() => {
+                  return (
+                    <>
+                      <div className={styles.barAndQrCodeWrapper}>
+                        <div
+                          style={{
+                            width: '170px',
+                            height: '180px',
+                            borderRadius: '0 0 5px 5px',
+                          }}
+                          className={styles.LoaderMask}
+                        />
+                      </div>
+
+                      <div
+                        style={{
+                          width: '170px',
+                          height: '50px',
+                          borderRadius: '15px',
+                        }}
+                        className={styles.LoaderMask}
+                      />
+                    </>
+                  );
+                })}
           </div>
           <Pagination
             style={{ marginTop: '20px' }}

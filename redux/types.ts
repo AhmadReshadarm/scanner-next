@@ -351,6 +351,7 @@ type TScanner = {
   scanners: Scanner[];
   length: number;
   loading: boolean;
+  updatingLoading: boolean;
 };
 
 type TProductReviewsState = {

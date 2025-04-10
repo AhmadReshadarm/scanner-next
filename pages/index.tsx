@@ -89,14 +89,13 @@ const IndexPage = () => {
   //       setLoadingPercent(0);
   //       return;
   //     }
-  //     console.log(scanners[index]);
 
   //     const isSaved: any = await dispatch(
   //       updateScanner({
   //         id: scanners[index].id,
   //         barCode: scanners[index].barCode,
   //         qrCode: scanners[index].qrCode,
-  //         tags: [tags[1].id],
+  //         tags: [tags[0].id],
   //       }),
   //     );
   //     if (isSaved.error) {
@@ -135,7 +134,7 @@ const IndexPage = () => {
             </button>
             {/* <button
               onClick={() => {
-                dispatch(fetchScanners({ limit: 12, offset: 0 }));
+                dispatch(fetchScanners({ limit: 100000, offset: 0 }));
               }}
             >
               loadData
