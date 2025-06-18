@@ -9,7 +9,6 @@ import { useScreenshot } from 'use-react-screenshot';
 import Pagination from 'antd/es/pagination';
 import { AppDispatch } from 'redux/store';
 import { clearTags, fetchTags } from 'redux/slicers/tagsSlicer';
-import { basicRequestParams } from 'common/constants';
 import { Tag } from 'swagger/services';
 
 const ScannedQrcodeScanned = () => {
@@ -17,7 +16,7 @@ const ScannedQrcodeScanned = () => {
   const tags: Tag[] = useAppSelector((state) => state.tags.tags);
   const [selectedDatabaseURL, setSelectedDatabaseURL] = useState('');
   useEffect(() => {
-    dispatch(fetchTags(basicRequestParams));
+    dispatch(fetchTags({ limit: '10000', offset: '0', orderBy: 'ASC' }));
     return () => {
       dispatch(clearTags());
     };

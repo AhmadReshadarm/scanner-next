@@ -288,6 +288,15 @@ interface FetchPayload {
   showOnMain?: boolean;
 }
 
+interface TagsQuaryDTO {
+  name?: string;
+  url?: string;
+  sortBy?: string;
+  orderBy?: string;
+  offset?: string;
+  limit?: string;
+}
+
 interface RequestResponse {
   data:
     | Category[]
@@ -415,4 +424,5 @@ export type {
   MailOptionsDTO,
   TScanner,
   TScannerPayload,
+  TagsQuaryDTO,
 };

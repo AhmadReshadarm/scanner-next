@@ -9,22 +9,24 @@ import {
 } from '../../common/helpers';
 import { PayloadTag } from 'common/interfaces/payload-tags.interface';
 import { openSuccessNotification } from 'common/helpers/openSuccessNotidication.helper';
-import { FetchPayload, RequestResponse, TTagState } from 'redux/types';
+import {
+  FetchPayload,
+  RequestResponse,
+  TagsQuaryDTO,
+  TTagState,
+} from 'redux/types';
 import { Tag, TagService } from 'swagger/services';
 import { handlePaginationDataFormatter } from 'redux/helpers';
 
 export const fetchTags = createAsyncThunk<
   RequestResponse,
-  FetchPayload,
+  TagsQuaryDTO,
   { rejectValue: string }
 >(
   'tags/fetchTags',
-  async function (payload: FetchPayload, { rejectWithValue }): Promise<any> {
+  async function (payload: TagsQuaryDTO, { rejectWithValue }): Promise<any> {
     try {
-      return await TagService.getTags({
-        limit: payload?.limit,
-        offset: payload?.offset,
-      });
+      return await TagService.getTags(payload);
     } catch (error: any) {
       return rejectWithValue(getErrorMassage(error.response.status));
     }

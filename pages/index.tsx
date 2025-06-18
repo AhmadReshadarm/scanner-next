@@ -28,7 +28,7 @@ const IndexPage = () => {
   const [selectedDatabase, setSelectedDatabase] = useState('');
   const [selectedDatabaseURL, setSelectedDatabaseURL] = useState('');
   useEffect(() => {
-    dispatch(fetchTags(basicRequestParams));
+    dispatch(fetchTags({ limit: '10000', offset: '0', orderBy: 'ASC' }));
     setClient(true);
     return () => {
       dispatch(clearTags());
@@ -39,7 +39,13 @@ const IndexPage = () => {
     if (tags.length !== 0) {
       setSelectedDatabase(tags[0].url);
       setSelectedDatabaseURL(tags[0].url);
-      dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
+      dispatch(
+        fetchScanners({
+          limit: 12,
+          offset: 0,
+          tags: [tags[0].url],
+        }),
+      );
     }
   }, [tags]);
 
@@ -126,7 +132,11 @@ const IndexPage = () => {
             <button
               onClick={() =>
                 dispatch(
-                  fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }),
+                  fetchScanners({
+                    limit: 12,
+                    offset: 0,
+                    tags: [selectedDatabaseURL],
+                  }),
                 )
               }
             >
@@ -161,6 +171,13 @@ const IndexPage = () => {
                   );
                 }}
               >
+                {tags.lenght > 0 ? (
+                  tags.reverse().map((tag) => {
+                    return <option value={tag.url}>{tag.name}</option>;
+                  })
+                ) : (
+                  <></>
+                )}
                 {tags.map((tag) => {
                   return <option value={tag.url}>{tag.name}</option>;
                 })}
