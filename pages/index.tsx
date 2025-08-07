@@ -9,6 +9,9 @@ import Pagination from 'antd/es/pagination';
 import { DeleteOutlined } from '@ant-design/icons';
 import { AppDispatch } from 'redux/store';
 import { clearTags, fetchTags } from 'redux/slicers/tagsSlicer';
+import { unwrapResult } from '@reduxjs/toolkit';
+import { ScannerResponse } from 'swagger/services';
+import ExcelJs from 'exceljs';
 
 // ---------------------------------------------------------------------------------------
 const IndexPage = () => {
@@ -82,32 +85,104 @@ const IndexPage = () => {
   };
 
   const dummy = [1, 2, 3, 4, 5, 6, 7, 8];
-  // const [loadingPercent, setLoadingPercent] = useState(0);
-  // const fixData = async () => {
-  //   const fixDataRecursively = async (index: number) => {
-  //     if (index >= scanners.length) {
-  //       setLoadingPercent(0);
-  //       return;
-  //     }
 
-  //     const isSaved: any = await dispatch(
-  //       updateScanner({
-  //         id: scanners[index].id,
-  //         barCode: scanners[index].barCode,
-  //         qrCode: scanners[index].qrCode,
-  //         tags: [tags[0].id],
-  //       }),
-  //     );
-  //     if (isSaved.error) {
-  //       openErrorNotification(`error in id: ${scanners[index].id}`);
-  //       dispatch(fetchScanners({ limit: 12, offset: 0, tags: [tags[0].url] }));
-  //       return;
-  //     }
-  //     setLoadingPercent(Math.floor((index * 100) / scanners.length));
-  //     fixDataRecursively(index + 1);
-  //   };
-  //   fixDataRecursively(0);
-  // };
+  // -----------------------------------------------------------------------------------
+
+  const handleProductDownloadInExcel = (
+    dispatch,
+    setLoadingData,
+    ExcelJs,
+    seLoadingProgress,
+  ) => {
+    setLoadingData(true);
+    dispatch(
+      fetchScanners({
+        limit: 100000,
+        offset: 0,
+        tags: [selectedDatabaseURL],
+      }),
+    )
+      .then(unwrapResult)
+      .then((response: ScannerResponse) => {
+        setLoadingData(true);
+        if (!response.rows || !Array.isArray(response.rows)) {
+          console.error(
+            'Error: Products data is missing or not in the expected format.',
+            response,
+          );
+          return; // Exit the function to prevent further errors
+        }
+
+        let workBook = new ExcelJs.Workbook();
+        const sheet = workBook.addWorksheet('subscribers');
+        sheet.columns = [
+          { header: 'ID', key: 'id', width: 20 },
+          { header: 'QR-код', key: 'qrCode', width: 100 },
+          { header: 'Штрих-код', key: 'barCode', width: 40 },
+        ];
+        sheet.getRow(1).alignment = {
+          vertical: 'middle',
+          horizontal: 'center',
+          wrapText: true,
+        };
+        // sheet.properties.defaultRowHeight = 115;
+        // console.log(response);
+        // setLoadingData(false);
+        // return;
+        let counter = 0;
+        let progress = 0;
+        const productIteration = async () => {
+          if (counter < response.rows!.length) {
+            progress = Math.floor((counter * 100) / response.rows!.length);
+            seLoadingProgress(progress);
+
+            await sheet.addRow({
+              id: response.rows![counter]?.id,
+              qrCode: response.rows![counter]?.qrCode,
+              barCode: response.rows![counter]?.barCode,
+            });
+            sheet.getRow(sheet.rowCount).alignment = {
+              vertical: 'middle',
+              horizontal: 'center',
+              wrapText: true,
+            };
+
+            counter = counter + 1;
+            productIteration();
+          } else {
+            try {
+              workBook.xlsx.writeBuffer().then((data) => {
+                const blob = new Blob([data], {
+                  type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                });
+                const url = window.URL.createObjectURL(blob);
+                const anchor = document.createElement('a');
+                anchor.href = url;
+                anchor.download = `${
+                  new Date().toISOString().split('T')[0]
+                }.xlsx`;
+                anchor.click();
+                window.URL.revokeObjectURL(url);
+              });
+              seLoadingProgress(100);
+              setLoadingData(false);
+              seLoadingProgress(0);
+            } catch (error) {
+              console.log(error);
+            }
+          }
+        };
+        productIteration();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const [loadingProgress, seLoadingProgress] = useState(0);
+  const [loadingData, setLoadingData] = useState(false);
+
+  // ----------------------------------------------------------------------------------------
 
   return (
     <div className={styles.Container}>
@@ -136,20 +211,20 @@ const IndexPage = () => {
             >
               Обновить данные
             </button>
-            {/* <button
-              onClick={() => {
-                dispatch(fetchScanners({ limit: 100000, offset: 0 }));
-              }}
-            >
-              loadData
-            </button>
             <button
-              onClick={() => {
-                fixData();
-              }}
+              onClick={() =>
+                handleProductDownloadInExcel(
+                  dispatch,
+                  setLoadingData,
+                  ExcelJs,
+                  seLoadingProgress,
+                )
+              }
             >
-              {loadingPercent !== 0 ? `fixing ${loadingPercent}%` : 'fix data'}
-            </button> */}
+              {loadingData
+                ? `Загрузка ${loadingProgress}%`
+                : 'Скачать все как Excel'}
+            </button>
             <div className={styles.options_container}>
               <h1>выберите базу данных</h1>
               <select
