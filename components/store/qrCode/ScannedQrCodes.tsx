@@ -1,15 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './scannedQrCode.module.css';
-import QRCode from 'react-qr-code';
-import Barcode from 'react-barcode';
+// import QRCode from 'react-qr-code';
+// import Barcode from 'react-barcode';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { TScanner } from 'redux/types';
 import { fetchScanners } from 'redux/slicers/scannerSlicer';
-import { useScreenshot } from 'use-react-screenshot';
+// import { useScreenshot } from 'use-react-screenshot';
 import Pagination from 'antd/es/pagination';
 import { AppDispatch } from 'redux/store';
 import { clearTags, fetchTags } from 'redux/slicers/tagsSlicer';
 import { Tag } from 'swagger/services';
+import Cards from './CardsRegular';
+import CardsSpecial from './CardsSpecial';
 
 const ScannedQrcodeScanned = () => {
   const dispatch = useAppDispatch();
@@ -120,59 +122,7 @@ const ScannedQrcodeScanned = () => {
 
   // -----------------------------------------------------------
   const dummy = [1, 2, 3, 4, 5, 6, 7, 8];
-  const Cards = ({ data }) => {
-    const ref = useRef(null);
-    const [image, takeScreenshot] = useScreenshot();
-    const getImage = () => takeScreenshot(ref.current);
-
-    return (
-      <>
-        <div ref={ref} className={styles.barAndQrCodeWrapper}>
-          <div className={styles.fullCodeWrapper}>
-            <div className={styles.qrWrapper}>
-              <QRCode
-                style={{
-                  height: 'auto',
-                  maxWidth: '100%',
-                  width: '100%',
-                }}
-                bgColor="#9D9D99"
-                value={`${data.qrCode}`}
-              />
-            </div>
-            <p className={styles.qrCodeNumber}>
-              {data.qrCode?.split('code=')[1]}
-            </p>
-          </div>
-          <div className={styles.barcodNumberWrapper}>
-            <Barcode
-              value={`${data.barCode}`}
-              height={40}
-              width={1.8}
-              margin={0}
-              displayValue={false}
-              background="#9D9D99"
-            />
-            <div className={styles.numbersWrapper}>
-              {data.barCode?.split('').map((numbers, index) => {
-                return <p key={index}>{numbers}</p>;
-              })}
-            </div>
-          </div>
-        </div>
-
-        <button className="image_generation_btn" onClick={getImage}>
-          Получить изображение QR-кода
-        </button>
-        <img
-          style={{ border: '1px solid', padding: '10px', borderRadius: '5px' }}
-          src={image}
-          alt="Нет данных"
-        />
-      </>
-    );
-  };
-
+  console.log(selectedDatabaseURL);
   return (
     <div className={styles.Container}>
       <div className={styles.Wrapper}>
@@ -188,6 +138,7 @@ const ScannedQrcodeScanned = () => {
             <select
               className={styles.option_wrapper}
               onChange={(evt) => {
+                setSelectedDatabaseURL(evt.target.value);
                 dispatch(
                   fetchScanners({
                     limit: 12,
@@ -207,7 +158,12 @@ const ScannedQrcodeScanned = () => {
               ? scanners.map((data, index) => {
                   return (
                     <div key={index} className={styles.codeContainer}>
-                      <Cards data={data} />
+                      {selectedDatabaseURL == 'duall' ||
+                      selectedDatabaseURL == 'puffmi' ? (
+                        <Cards data={data} />
+                      ) : (
+                        <CardsSpecial data={data} />
+                      )}
                     </div>
                   );
                 })
