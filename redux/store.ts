@@ -6,60 +6,60 @@ import {
   ThunkAction,
 } from '@reduxjs/toolkit';
 import { createWrapper, HYDRATE } from 'next-redux-wrapper';
-import authReducer from './slicers/authSlicer';
-import categoriesReducer from './slicers/categoriesSlicer';
-import colorsReducer from './slicers/colorsSlicer';
-import brandsReducer from './slicers/brandsSlicer';
-import productsReducer from './slicers/productsSlicer';
-import imagesReducer from './slicers/imagesSlicer';
-import multipleImagesSlicer from './slicers/mutipleImagesSlicer';
+// import authReducer from './slicers/authSlicer';
+// import categoriesReducer from './slicers/categoriesSlicer';
+// import colorsReducer from './slicers/colorsSlicer';
+// import brandsReducer from './slicers/brandsSlicer';
+// import productsReducer from './slicers/productsSlicer';
+// import imagesReducer from './slicers/imagesSlicer';
+// import multipleImagesSlicer from './slicers/mutipleImagesSlicer';
 import tagsReducer from './slicers/tagsSlicer';
-import sizesReducer from './slicers/sizesSlicer';
-import questionReducer from './slicers/questionSlicer';
-import reviewsReducer from './slicers/reviewsSlicer';
-import globalSlicer from './slicers/store/globalSlicer';
-import globalUISlicer from './slicers/store/globalUISlicer';
-import checkoutsReducer from './slicers/checkoutsSlicer';
-import cartSlicer from './slicers/store/cartSlicer';
-import catalogSlicer from './slicers/store/catalogSlicer';
+// import sizesReducer from './slicers/sizesSlicer';
+// import questionReducer from './slicers/questionSlicer';
+// import reviewsReducer from './slicers/reviewsSlicer';
+// import globalSlicer from './slicers/store/globalSlicer';
+// import globalUISlicer from './slicers/store/globalUISlicer';
+// import checkoutsReducer from './slicers/checkoutsSlicer';
+// import cartSlicer from './slicers/store/cartSlicer';
+// import catalogSlicer from './slicers/store/catalogSlicer';
 // import analyticsReducer from './slicers/analyticsSlicer';
-import productInfoSlicer from './slicers/store/productInfoSlicer';
-import homePageSlicer from './slicers/store/homePageSlicer';
-import bannersReducer from './slicers/bannersSlicer';
-import storeCheckoutSlicer from './slicers/store/checkoutSlicer';
-import wishlistSlicer from './slicers/store/wishlistSlicer';
-import profileSlicer from './slicers/store/profileSlicer';
+// import productInfoSlicer from './slicers/store/productInfoSlicer';
+// import homePageSlicer from './slicers/store/homePageSlicer';
+// import bannersReducer from './slicers/bannersSlicer';
+// import storeCheckoutSlicer from './slicers/store/checkoutSlicer';
+// import wishlistSlicer from './slicers/store/wishlistSlicer';
+// import profileSlicer from './slicers/store/profileSlicer';
 // import newsSlicer from './slicers/newsSlicer';
-import subscriberSlicer from './slicers/subscriberSlicer';
+// import subscriberSlicer from './slicers/subscriberSlicer';
 import scannerSlicer from './slicers/scannerSlicer';
 
 const combinedReducer = combineReducers({
-  categories: categoriesReducer,
-  auth: authReducer,
-  colors: colorsReducer,
-  brands: brandsReducer,
-  products: productsReducer,
-  images: imagesReducer,
-  multipleImages: multipleImagesSlicer,
+  // categories: categoriesReducer,
+  // auth: authReducer,
+  // colors: colorsReducer,
+  // brands: brandsReducer,
+  // products: productsReducer,
+  // images: imagesReducer,
+  // multipleImages: multipleImagesSlicer,
   tags: tagsReducer,
-  sizes: sizesReducer,
-  questions: questionReducer,
-  reviews: reviewsReducer,
-  checkouts: checkoutsReducer,
-  // analytics: analyticsReducer,
-  banners: bannersReducer,
-  // newsPosts: newsSlicer,
-  subscribers: subscriberSlicer,
+  // sizes: sizesReducer,
+  // // questions: questionReducer,
+  // reviews: reviewsReducer,
+  // checkouts: checkoutsReducer,
+  // // analytics: analyticsReducer,
+  // banners: bannersReducer,
+  // // newsPosts: newsSlicer,
+  // subscribers: subscriberSlicer,
 
-  global: globalSlicer,
-  globalUI: globalUISlicer,
-  cart: cartSlicer,
-  catalog: catalogSlicer,
-  productInfo: productInfoSlicer,
-  homePage: homePageSlicer,
-  storeCheckout: storeCheckoutSlicer,
-  wishlist: wishlistSlicer,
-  profile: profileSlicer,
+  // global: globalSlicer,
+  // globalUI: globalUISlicer,
+  // cart: cartSlicer,
+  // catalog: catalogSlicer,
+  // productInfo: productInfoSlicer,
+  // homePage: homePageSlicer,
+  // storeCheckout: storeCheckoutSlicer,
+  // wishlist: wishlistSlicer,
+  // profile: profileSlicer,
   scanner: scannerSlicer,
 });
 

@@ -40,21 +40,21 @@ import { axiosInstance } from 'common/axios.instance';
 import { fetchWishlistProducts } from 'redux/slicers/store/wishlistSlicer';
 import styles from './styles/header.module.css';
 
-const HeaderCatalog = dynamic(() => import('./utils/HeaderCatalog/index'), {
-  ssr: false,
-});
-const SearchBar = dynamic(() => import('./utils/SearchBar'), {
-  ssr: false,
-});
-const HeaderWishlist = dynamic(() => import('./utils/HeaderWishlist'), {
-  ssr: false,
-});
-const HeaderCart = dynamic(() => import('./utils/HeaderCart'), {
-  ssr: false,
-});
-const AuthorizationModel = dynamic(() => import('./utils/HeaderAuth/index'), {
-  ssr: false,
-});
+// const HeaderCatalog = dynamic(() => import('./utils/HeaderCatalog/index'), {
+//   ssr: false,
+// });
+// const SearchBar = dynamic(() => import('./utils/SearchBar'), {
+//   ssr: false,
+// });
+// const HeaderWishlist = dynamic(() => import('./utils/HeaderWishlist'), {
+//   ssr: false,
+// });
+// const HeaderCart = dynamic(() => import('./utils/HeaderCart'), {
+//   ssr: false,
+// });
+// const AuthorizationModel = dynamic(() => import('./utils/HeaderAuth/index'), {
+//   ssr: false,
+// });
 
 const Header = () => {
   const dispatch = useAppDispatch();
@@ -379,7 +379,7 @@ const Header = () => {
             </div>
           </div>
 
-          <HeaderCatalog catelogButtonRef={catelogButtonRef} />
+          {/* <HeaderCatalog catelogButtonRef={catelogButtonRef} />
           <SearchBar
             searchButtonRef={searchButtonRef}
             windowWidth={windowWidth}
@@ -389,7 +389,7 @@ const Header = () => {
           <AuthorizationModel
             authButtonRef={authButtonRef}
             windowWidth={windowWidth}
-          />
+          /> */}
         </div>
       </div>
       <NavMobile />

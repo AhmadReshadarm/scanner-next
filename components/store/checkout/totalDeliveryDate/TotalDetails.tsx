@@ -135,7 +135,7 @@ const TotalDetails = ({ comment, leaveNearDoor, setLoading }) => {
 
   return (
     <>
-      <YandexMetricaProvider
+      {/* <YandexMetricaProvider
         tagID={96632717}
         initParameters={{
           clickmap: true,
@@ -247,7 +247,7 @@ const TotalDetails = ({ comment, leaveNearDoor, setLoading }) => {
         })}`,
           }}
         />
-      </YandexMetricaProvider>
+      </YandexMetricaProvider> */}
     </>
   );
 };
