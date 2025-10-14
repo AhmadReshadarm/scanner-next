@@ -1,0 +1,24 @@
+.logo {
+  height: 32px;
+  margin: 16px;
+  font-size: 33px;
+  font-weight: bold;
+  line-height: 28px;
+  color: #fff;
+}
+
+.site-layout {
+  &__content {
+    background: #fff;
+    padding: 24px;
+    min-height: calc(100vh - 188px);
+  }
+
+  &__header {
+    background: #fff;
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    padding: 0 15px;
+  }
+}
