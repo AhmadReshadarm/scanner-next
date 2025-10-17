@@ -126,7 +126,11 @@ const CodeDecoder: React.FC<Props> = ({
               type="text"
               placeholder="QR-код"
               value={qrData}
-              onChange={(evt) => setQrData(evt.target.value)}
+              onChange={(evt) => {
+                setQrData(evt.target.value);
+                const barValue = evt.target.value.slice(39, 49);
+                setBarData(barValue);
+              }}
               onKeyDown={(evt) => {
                 if (evt.key === 'Enter' && nextInput.current) {
                   nextInput.current.focus();
