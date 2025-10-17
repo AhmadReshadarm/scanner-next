@@ -128,7 +128,7 @@ const CodeDecoder: React.FC<Props> = ({
               value={qrData}
               onChange={(evt) => {
                 setQrData(evt.target.value);
-                const barValue = evt.target.value.slice(39, 49);
+                const barValue = evt.target.value.slice(39, 47);
                 setBarData(barValue);
               }}
               onKeyDown={(evt) => {
