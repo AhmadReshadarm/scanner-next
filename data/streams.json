@@ -1,0 +1,211 @@
+[
+  {
+    "branch": "2я Заводская",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@178.218.114.197:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@178.218.114.197:555/stream1"
+    ]
+  },
+  {
+    "branch": "Юбилейная",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@213.219.229.75:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@213.219.229.75:555/stream1"
+    ]
+  },
+  {
+    "branch": "Маяковского 18",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@213.219.229.35:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@213.219.229.35:556/stream1"
+    ]
+  },
+  {
+    "branch": "Побратимов",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@93.157.232.54:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@93.157.232.54:555/stream1"
+    ]
+  },
+  {
+    "branch": "Вуги",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@109.206.141.4:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@109.206.141.4:555/stream1"
+    ]
+  },
+  {
+    "branch": "Пролетарская",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@79.137.190.41:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@79.137.190.41:555/stream1"
+    ]
+  },
+  {
+    "branch": "Некрасово",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@79.137.190.131:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@79.137.190.131:555/stream1"
+    ]
+  },
+  {
+    "branch": "Октябрьский 403",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.24.69:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.24.69:555/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.24.69:556/stream1"
+    ]
+  },
+  {
+    "branch": "3е почтовое",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.46.241:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.46.241:555/stream1"
+    ]
+  },
+  {
+    "branch": "Воинов",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@91.107.5.67:554/stream1"]
+  },
+  {
+    "branch": "Октябрьский 181",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.59.173:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.59.173:555/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.59.173:555/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.59.173:556/stream1"
+    ]
+  },
+  {
+    "branch": "Гоголя",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@109.206.145.91:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@109.206.145.91:555/stream1"
+    ]
+  },
+  {
+    "branch": "8 Марта",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@213.248.29.79:554/stream1"]
+  },
+  {
+    "branch": "Южная",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@213.248.29.161:554/stream1"]
+  },
+  {
+    "branch": "Южная (IP 91.107.57.32)",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@91.107.57.32:556/stream1"]
+  },
+  {
+    "branch": "попова",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@109.206.140.142:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@109.206.140.142:555/stream1"
+    ]
+  },
+  {
+    "branch": "Новая",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@89.208.176.101:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@89.208.176.101:555/stream1"
+    ]
+  },
+  {
+    "branch": "ленина 13",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@213.248.29.17:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@213.248.29.17:555/stream1"
+    ]
+  },
+  {
+    "branch": "Карла маркса 111",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@95.163.5.224:554/stream1"]
+  },
+  {
+    "branch": "Карла маркса 109",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@89.208.187.163:554/stream1"]
+  },
+  {
+    "branch": "комсомольская",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@213.248.29.39:555/stream1"]
+  },
+  {
+    "branch": "Свердлова 1Б",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@79.137.190.102:554/stream1"]
+  },
+  {
+    "branch": "Смирновская 16",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@91.107.35.50:554/stream1"]
+  },
+  {
+    "branch": "Калинина",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@213.248.29.83:554/stream1"]
+  },
+  {
+    "branch": "Октябрьская 327",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.53.171:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@91.107.53.171:555/stream1"
+    ]
+  },
+  {
+    "branch": "Октябрьская 325",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@91.107.48.5:554/stream1"]
+  },
+  {
+    "branch": "Лорха",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@95.163.185.180:554/stream1"]
+  },
+  {
+    "branch": "Реутов",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@89.208.176.180:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@89.208.176.180:555/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@89.208.176.180:556/stream1"
+    ]
+  },
+  {
+    "branch": "королев 26",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@79.137.190.51:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@79.137.190.51:556/stream1"
+    ]
+  },
+  {
+    "branch": "космонавтов 27б",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@85.192.36.140:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@85.192.36.140:555/stream1"
+    ]
+  },
+  {
+    "branch": "Ленина 19",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@109.206.145.169:554/stream1"]
+  },
+  {
+    "branch": "окт.23",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@213.248.29.5:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@213.248.29.5:555/stream1"
+    ]
+  },
+  {
+    "branch": "Свердлова 27",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@213.248.29.29:555/stream1"]
+  },
+  {
+    "branch": "Митрофаново",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@213.248.29.33:554/stream1"]
+  },
+  {
+    "branch": "Стрекалово",
+    "links": [
+      "rtsp://lady.khumor@mail.ru:absd123A@213.248.29.49:554/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@213.248.29.49:555/stream1",
+      "rtsp://lady.khumor@mail.ru:absd123A@213.248.29.49:556/stream1"
+    ]
+  },
+  {
+    "branch": "Заводская 23",
+    "links": ["rtsp://lady.khumor@mail.ru:absd123A@79.137.161.233:554/stream1"]
+  }
+]

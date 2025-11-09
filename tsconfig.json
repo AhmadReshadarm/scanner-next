@@ -22,5 +22,10 @@
     "incremental": true
   },
   "include": [".", "additional.d.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts",
+    // Exclude the HLS output directory
+    "public/hls"
+  ]
 }

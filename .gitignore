@@ -35,6 +35,10 @@ debug.log
 /public/sitemap-0.xml
 robots.txt
 
+
+# misalience
+/public/hls/*
+
 #cache
 /webprojnpm-cache
 nginx.conf
