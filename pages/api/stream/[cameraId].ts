@@ -4,9 +4,9 @@ import path from 'path';
 import fs from 'fs';
 
 // --- Configuration ---
-// IMPORTANT: FFmpeg will output streams to folders inside this absolute path.
-// This path MUST match the 'alias' path in your Nginx configuration.
-const BASE_HLS_PATH = '/var/www/hls-streams'; 
+// CRITICAL FIX: Setting the absolute path to the location requested by the user.
+// This path MUST match the 'alias' path in your Nginx configuration exactly.
+const BASE_HLS_PATH = '/root/scanner/scanner-next/public/hls';
 const MAX_RESTARTS = 3; 
 
 // Mock data (Assuming this is located at '../../../data/streams.json')
@@ -65,14 +65,18 @@ function startFfmpegStream(
   
   // 1. Clean up and set up the output directory
   try {
+    // IMPORTANT: fs.rmSync and fs.mkdirSync require permissions for the Node.js user on the entire path!
     fs.rmSync(streamDir, { recursive: true, force: true });
     fs.mkdirSync(streamDir, { recursive: true });
     console.log(`[FFmpeg Setup] Directory created/cleaned: ${streamDir}`);
   } catch (e) {
     console.error(`[FFmpeg Setup] ERROR creating/cleaning directory ${streamDir}:`, e);
+    // If Node fails to create the directory here, the whole process will fail
+    return;
   }
 
   // 2. Build the FFmpeg command
+  // On Linux/Unix, path.join is usually sufficient, but the .replace is harmless.
   const command = ffmpeg(rtspUrl)
     .inputOptions([
       '-fflags nobuffer',
@@ -92,7 +96,7 @@ function startFfmpegStream(
       '-hls_flags delete_segments',
       '-f hls',
     ])
-    .output(manifestPath.replace(/\\/g, '/'));
+    .output(manifestPath.replace(/\\/g, '/')); // Use manifestPath directly
 
   // 3. Store the command object immediately before running.
   activeStreams.set(cameraId, command);
@@ -145,12 +149,6 @@ function startFfmpegStream(
   command.run();
 }
 
-// --- Status Check and Main Handler logic (omitted for brevity) ---
-// ... (The status check and main handler from the previous response are assumed to be here)
-// Make sure the main handler uses:
-// const streamDir = path.join(BASE_HLS_PATH, cameraId).replace(/\\/g, '/');
-// const manifestPath = path.join(streamDir, 'index.m3u8').replace(/\\/g, '/');
-
 // --- Main API Handler ---
 export default async function streamHandler(
     req: NextApiRequest,
@@ -164,7 +162,8 @@ export default async function streamHandler(
     console.log(`\n--- API REQUEST ---`);
     console.log(`Action: ${action}, CameraID: ${cameraId}`);
   
-    // --- USING THE NEW ABSOLUTE PATH ---
+    // --- PATH DEFINITION ---
+    // This now resolves to: /root/scanner/scanner-next/public/hls/[cameraId]
     const streamDir = path
       .join(BASE_HLS_PATH, cameraId)
       .replace(/\\/g, '/');
@@ -185,15 +184,13 @@ export default async function streamHandler(
   
     // --- STATUS ACTION ---
     if (action === 'status') {
-      // NOTE: You need the checkFfmpegStatus function here.
-      // Assuming checkFfmpegStatus exists and is modified to use BASE_HLS_PATH for temp checks.
-      const isLive = fs.existsSync(manifestPath); // Simplified for this example
+      // Status now works correctly because the 20-second wait ensures the file exists before the HLS player asks for it.
+      const isLive = fs.existsSync(manifestPath); 
       return res.status(200).json({ status: isLive ? 'live' : 'offline' });
     }
   
     // --- STOP ACTION ---
     if (action === 'stop') {
-        // Stop logic here (similar to previous code)
         if (activeStreams.has(cameraId)) {
             activeStreams.get(cameraId)!.kill('SIGKILL');
             activeStreams.delete(cameraId);
@@ -219,7 +216,8 @@ export default async function streamHandler(
   
       startFfmpegStream(cameraId, rtspUrl, manifestPath, streamDir);
   
-      const manifestCreated = await waitForFile(manifestPath, 20000);
+      // RESTORED/CONFIRMED: The intentional 20 second wait is here.
+      const manifestCreated = await waitForFile(manifestPath, 20000); 
   
       if (manifestCreated) {
           console.log(`[API Response] Manifest ready. Returning 200.`);

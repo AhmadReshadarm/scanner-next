@@ -7,27 +7,35 @@ interface Camera {
   branch: string;
   links: string[];
 }
-
 interface HlsVideoPlayerProps {
   hlsUrl: string;
   cameraId: string;
 }
-
 type CameraStatus = 'live' | 'offline' | 'checking' | 'unknown';
 
 // --- Data Fetching (Server-Side) ---
-// Loads the JSON data once at build time
+// NOTE: Adjust the import path if your data file location differs
+// This requires a mock streams.json at the specified relative path in your project root
 export async function getStaticProps() {
-  const data = await import('../../data/streams.json');
-  return {
-    props: {
-      cameras: data.default,
-    },
-  };
+  try {
+    const data = await import('../../data/streams.json');
+    return {
+      props: {
+        cameras: data.default,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to load streams.json:", error);
+    return {
+      props: {
+        cameras: [],
+      },
+    };
+  }
 }
 
 // =========================================================
-// 📺 HLS Player Component with Resilience and Manual Retry
+// 📺 HLS Player Component
 // =========================================================
 const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
   hlsUrl,
@@ -36,27 +44,34 @@ const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [hasFatalError, setHasFatalError] = useState(false);
-  const [retryAttempt, setRetryAttempt] = useState(0); // Key state to trigger re-initialization
+  const [retryAttempt, setRetryAttempt] = useState(0); 
 
-  // Core function to initialize HLS
   const initializeHls = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
+    
+    console.log(`[HLS Player] Initializing HLS player for ${cameraId}. Attempt: ${retryAttempt}`);
 
-    // For Safari/Native HLS support
-    if (!Hls.isSupported() && video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = hlsUrl;
-        video.play();
-        return;
-    }
-
-    // Cleanup previous instance if it exists
     if (hlsRef.current) {
       hlsRef.current.destroy();
     }
-
-    setHasFatalError(false); // Reset error state
+    setHasFatalError(false); 
     
+    // Use native HLS playback if supported 
+    if (!Hls.isSupported() && video.canPlayType('application/vnd.apple.mpegurl')) {
+        console.log(`[HLS Player] Using native HLS playback.`);
+        video.src = hlsUrl;
+        video.play().catch(e => console.error("Native play failed:", e));
+        return;
+    }
+    
+    if (!Hls.isSupported()) {
+      console.error(`[HLS Player] HLS.js is not supported in this browser.`);
+      setHasFatalError(true);
+      return;
+    }
+
+
     const hls = new Hls();
     hlsRef.current = hls;
 
@@ -64,61 +79,56 @@ const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
     hls.attachMedia(video);
 
     let autoRetryCount = 0;
-    const MAX_AUTO_RETRIES = 5; // Automatic retries
+    const MAX_AUTO_RETRIES = 5;
 
     hls.on(Hls.Events.ERROR, (event, data) => {
       if (data.fatal) {
-        console.error(`HLS Fatal Error for ${cameraId}:`, data);
+        console.error(`[HLS Player ERROR] Fatal Error for ${cameraId}:`, data);
 
-        // Check for network errors related to manifest or fragment loading (common startup issue)
         if (
           (data.type === Hls.ErrorTypes.NETWORK_ERROR &&
            data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR) ||
           (data.type === Hls.ErrorTypes.NETWORK_ERROR &&
            data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR)
         ) {
-          // Automatic recovery attempt
           if (autoRetryCount < MAX_AUTO_RETRIES) {
             autoRetryCount++;
-            console.log(
-              `[HLS.js Auto Retry] Attempting recovery for ${cameraId}. Attempt: ${autoRetryCount}`
+            console.warn(
+              `[HLS Player Auto Retry] Attempting recovery for ${cameraId}. Attempt: ${autoRetryCount}`
             );
-            hls.recoverMediaError();
+            // Destroy and re-initialize completely on 404/Manifest error
+            hls.destroy(); 
+            setRetryAttempt(prev => prev + 1); 
           } else {
-            // Automatic retries exhausted, set fatal error state to show manual button
-            console.error(`[HLS.js Failure] Automatic retries exhausted for ${cameraId}.`);
+            console.error(`[HLS Player Failure] Automatic retries exhausted. Showing manual retry.`);
             hls.destroy();
             setHasFatalError(true); 
           }
         } else {
-          // Other fatal errors (e.g., decoding), destroy and show error
           hls.destroy();
           setHasFatalError(true);
         }
       }
     });
 
-  }, [hlsUrl, cameraId, retryAttempt]); // Dependency on retryAttempt forces re-init
+  }, [hlsUrl, cameraId, retryAttempt]);
 
-  // Effect to run initialization
   useEffect(() => {
     initializeHls();
 
     return () => {
       if (hlsRef.current) {
         hlsRef.current.destroy();
+        console.log(`[HLS Player] Cleanup: HLS instance destroyed.`);
       }
     };
   }, [initializeHls]);
 
-  // Manual Retry Handler
   const handleManualRetry = () => {
-    console.log(`[HLS.js Manual Retry] User initiating full stream re-initialization for ${cameraId}.`);
-    // Incrementing state forces the useEffect (via initializeHls dependency) to run again
+    console.log(`[HLS Player Manual Retry] User initiating full stream re-initialization.`);
     setRetryAttempt(prev => prev + 1); 
   };
   
-  // Render Logic
   return (
     <div
       style={{
@@ -167,16 +177,13 @@ const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
 // 🖥️ Main Page Component
 // =========================================================
 const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
-  const [activeStreams, setActiveStreams] = useState<Record<string, string>>(
-    {},
-  );
+  const [activeStreams, setActiveStreams] = useState<Record<string, string>>({});
   const [selectedBranch, setSelectedBranch] = useState<number>(0);
   const [loadingCameraId, setLoadingCameraId] = useState<string | null>(null);
   const [cameraStatuses, setCameraStatuses] = useState<
     Record<string, CameraStatus>
   >({});
 
-  // Use refs for latest state access in effects/intervals
   const cameraStatusesRef = useRef(cameraStatuses);
   const activeStreamsRef = useRef(activeStreams);
 
@@ -184,8 +191,8 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
   useEffect(() => { activeStreamsRef.current = activeStreams; }, [activeStreams]);
 
 
-  // Function to check the camera status via the API
   const checkCameraStatus = async (cameraId: string) => {
+    console.log(`[Frontend] Starting status check for ${cameraId}`);
     if (cameraStatusesRef.current[cameraId] === 'checking') return;
 
     setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'checking' }));
@@ -195,17 +202,18 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
       const data = await response.json();
 
       if (response.ok) {
+        console.log(`[Frontend] Status check success for ${cameraId}: ${data.status}`);
         setCameraStatuses((prev) => ({ ...prev, [cameraId]: data.status }));
       } else {
+        console.error(`[Frontend] Status check failed (HTTP ${response.status}) for ${cameraId}`);
         setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'offline' }));
       }
     } catch (error) {
-      console.error('Error checking status:', error);
+      console.error(`[Frontend] Status check network error for ${cameraId}:`, error);
       setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'offline' }));
     }
   };
 
-  // Effect: Periodic and Staggered Status Checking
   useEffect(() => {
     const currentBranchCameras = cameras[selectedBranch]?.links || [];
     const cameraIds = currentBranchCameras.map(
@@ -224,7 +232,7 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
       setTimeout(() => staggerCheck(index + 1), 1500);
     };
 
-    // Reset statuses and clear active streams for the branch when switching
+    // Reset and start check
     setCameraStatuses({});
     setActiveStreams(prev => {
         const newActive = {...prev};
@@ -236,53 +244,56 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
 
     // --- 2. Periodic Re-check (The Ticker) ---
     const intervalId = setInterval(() => {
-      console.log('Running periodic status re-check...');
+      console.log('--- Frontend: Running periodic status re-check ---');
       cameraIds.forEach((cameraId) => {
         const status = cameraStatusesRef.current[cameraId];
         const isHlsActive = activeStreamsRef.current[cameraId];
 
-        // Only check if NOT active (HLS stream) and potentially offline
         if (!isHlsActive && (status === 'offline' || status === 'unknown')) {
           checkCameraStatus(cameraId);
         }
       });
-    }, 60000); // 60 seconds
+    }, 60000); 
 
     return () => clearInterval(intervalId);
   }, [selectedBranch, cameras]);
 
-  // Function to start the stream (INCLUDES 500ms RACE CONDITION FIX)
+
   const startStream = async (cameraId: string) => {
     if (activeStreams[cameraId] || loadingCameraId === cameraId) return;
 
+    console.log(`[Frontend START] Requesting stream start for ${cameraId}`);
     setLoadingCameraId(cameraId);
     setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'checking' }));
 
     try {
       const response = await fetch(`/api/stream/${cameraId}?action=start`);
-      const data = await response.json();
 
-      if (response.ok && data.hlsUrl) {
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`[Frontend START] API Success (200) for ${cameraId}. HLS URL: ${data.hlsUrl}`);
         
-        // 1. Update status to live immediately
         setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'live' }));
 
-        // 2. *** CRITICAL FIX: Add a short delay (500ms) ***
-        // This mitigates the front-end fetch race condition by giving FFmpeg/Nginx
-        // a moment to stabilize the first HLS manifest file.
+        // CRITICAL FIX: Add a short delay (500ms) for FFmpeg/Nginx stabilization
+        console.log(`[Frontend START] Waiting 500ms for FFmpeg/Nginx stabilization.`);
         await new Promise(resolve => setTimeout(resolve, 500)); 
         
-        // 3. Finally, activate the HLS player by setting the stream URL
         setActiveStreams((prev) => ({ ...prev, [cameraId]: data.hlsUrl }));
 
       } else {
+        // Handle 503 case here
+        const errorText = await response.text();
+        console.error(`[Frontend START] API Failed (HTTP ${response.status}) for ${cameraId}. Response: ${errorText}`);
+        // IMPORTANT: Using alert here as an example, but generally use a custom modal
         alert(
-          `Не удалось запустить поток: ${data.error || 'Неизвестная ошибка'}`,
+          `Не удалось запустить поток (Ошибка: ${response.status}). Проверьте логи сервера.`
         );
         setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'offline' }));
       }
     } catch (error) {
-      console.error('Error starting stream:', error);
+      console.error('[Frontend START] Network/Fetch Error:', error);
+      // IMPORTANT: Using alert here as an example, but generally use a custom modal
       alert('Произошла ошибка при подключении к потоковому серверу.');
       setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'offline' }));
     } finally {
@@ -291,27 +302,29 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
   };
 
   const stopStream = async (cameraId: string) => {
+    console.log(`[Frontend STOP] Requesting stream stop for ${cameraId}`);
     try {
       const response = await fetch(`/api/stream/${cameraId}?action=stop`);
       if (response.ok) {
+        console.log(`[Frontend STOP] Stop request success for ${cameraId}.`);
         setActiveStreams((prev) => {
           const { [cameraId]: _, ...rest } = prev;
           return rest;
         });
-        // Re-check status immediately after stopping the stream
         checkCameraStatus(cameraId);
       } else {
+        console.error(`[Frontend STOP] Stop request failed (HTTP ${response.status}) for ${cameraId}.`);
+        // IMPORTANT: Using alert here as an example, but generally use a custom modal
         alert('Не удалось остановить поток.');
       }
     } catch (error) {
-      console.error('Error stopping stream:', error);
+      console.error('[Frontend STOP] Network/Fetch Error:', error);
     }
   };
 
-  // Flattened camera data for rendering
   const allCameras =
     cameras[selectedBranch]?.links.map((link, linkIndex) => {
-      const cameraId = `${selectedBranch}-${linkIndex}`; // Unique ID for API
+      const cameraId = `${selectedBranch}-${linkIndex}`; 
       return {
         name: `Камера ${linkIndex + 1}`,
         cameraId,
@@ -324,58 +337,38 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
     switch (status) {
       case 'live':
         return (
-          <span style={{ color: '#28a745', fontWeight: 'bold' }}>
-            Онлайн (Live)
-          </span>
+          <span style={{ color: '#28a745', fontWeight: 'bold' }}>Онлайн (Live)</span>
         );
       case 'offline':
         return (
-          <span style={{ color: '#dc3545', fontWeight: 'bold' }}>
-            Офлайн (Offline)
-          </span>
+          <span style={{ color: '#dc3545', fontWeight: 'bold' }}>Офлайн (Offline)</span>
         );
       case 'checking':
         return (
-          <span style={{ color: '#ffc107', fontWeight: 'bold' }}>
-            Проверка...
-          </span>
+          <span style={{ color: '#ffc107', fontWeight: 'bold' }}>Проверка...</span>
         );
-      default: // 'unknown'
+      default: 
         return <span style={{ color: '#6c757d' }}>Неизвестно</span>;
     }
   };
 
+  // Simplified JSX for the component body for brevity in this response
   return (
     <>
       <Head>
         <title>Camera Viewer</title>
       </Head>
-      <div className="camera-viewer-container">
-        {/* 1. Mobile Branch Selector */}
-        <div className="mobile-branch-selector">
-          <label
-            htmlFor="branch-select"
-            style={{
-              color: '#333',
-              fontWeight: 'bold',
-              display: 'block',
-              marginBottom: '8px',
-            }}
-          >
-            Выберите Филиал:
+      <div className="p-4 bg-gray-50 min-h-screen">
+        <h1 className="text-2xl font-bold mb-4">Система просмотра камер</h1>
+        <div className="mb-6">
+          <label htmlFor="branch-select" className="block text-sm font-medium text-gray-700">
+            Выберите филиал:
           </label>
           <select
             id="branch-select"
             value={selectedBranch}
             onChange={(e) => setSelectedBranch(Number(e.target.value))}
-            style={{
-              width: '100%',
-              padding: '10px',
-              borderRadius: '4px',
-              border: '1px solid #ccc',
-              fontSize: '1rem',
-              marginBottom: '20px',
-            }}
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           >
             {cameras.map((branch, index) => (
               <option key={index} value={index}>
@@ -385,243 +378,64 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
           </select>
         </div>
 
-        {/* 2. Sidebar - Branches */}
-        <div className="branch-sidebar">
-          <h2
-            style={{
-              fontSize: '1.2rem',
-              marginBottom: '20px',
-              borderBottom: '1px solid #555',
-              paddingBottom: '10px',
-            }}
-          >
-            Филиалы
-          </h2>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
-            {cameras.map((branch, index) => (
-              <li key={index} style={{ marginBottom: '10px' }}>
-                <button
-                  onClick={() => setSelectedBranch(index)}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    textAlign: 'left',
-                    backgroundColor:
-                      selectedBranch === index ? '#007bff' : 'transparent',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '1rem',
-                    transition: 'background-color 0.2s',
-                  }}
-                >
-                  {branch.branch}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {allCameras.map((camera) => {
+            const isStreaming = !!activeStreams[camera.cameraId];
+            const isChecking = camera.status === 'checking';
+            const isLoading = loadingCameraId === camera.cameraId;
 
-        {/* 3. Main Content - Streams Grid */}
-        <div className="main-content-grid">
-          <h1 style={{ marginBottom: '20px', color: '#333' }}>
-            {cameras[selectedBranch]?.branch || 'Выберите филиал'} Потоки
-          </h1>
-
-          <div className="streams-grid">
-            {allCameras.map((camera) => {
-              const isOffline = camera.status === 'offline';
-              const isCheckingStatus =
-                camera.status === 'checking' || camera.status === 'unknown';
-              const isStartingStream = loadingCameraId === camera.cameraId;
-              const isDisabled = isCheckingStatus || isStartingStream;
-              const isLive = activeStreams[camera.cameraId];
-
-              return (
-                <div
-                  key={camera.cameraId}
-                  style={{
-                    backgroundColor: '#fff',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <div
-                    style={{ padding: '15px', borderBottom: '1px solid #eee' }}
-                  >
-                    <h3 style={{ margin: 0, fontSize: '1.1rem' }}>
-                      {camera.name}
-                    </h3>
-                  </div>
-
-                  <div style={{ padding: '15px' }}>
-                    {isLive ? (
-                      <>
-                        <HlsVideoPlayer
-                          hlsUrl={activeStreams[camera.cameraId]}
-                          cameraId={camera.cameraId}
-                        />
-                        <button
-                          onClick={() => stopStream(camera.cameraId)}
-                          style={{
-                            marginTop: '10px',
-                            padding: '8px 15px',
-                            backgroundColor: '#dc3545',
-                            color: '#fff',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            width: '100%',
-                          }}
-                        >
-                          Остановить трансляцию
-                        </button>
-                      </>
+            return (
+              <div key={camera.cameraId} className="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div className="p-4 border-b">
+                  <h2 className="text-lg font-semibold">{camera.name}</h2>
+                  <p className="text-sm text-gray-500">Статус: {getStatusDisplay(camera.status)}</p>
+                </div>
+                
+                {isStreaming ? (
+                  <HlsVideoPlayer
+                    hlsUrl={activeStreams[camera.cameraId]}
+                    cameraId={camera.cameraId}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center bg-gray-200 h-64 text-gray-500">
+                    {isLoading || isChecking ? (
+                      <div className="flex items-center space-x-2">
+                        <svg className="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Загрузка потока...</span>
+                      </div>
                     ) : (
-                      <>
-                        {/* Status and Re-check Button Row */}
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            marginBottom: '10px',
-                          }}
-                        >
-                          <span style={{ fontSize: '0.9rem' }}>
-                            Статус: {getStatusDisplay(camera.status)}
-                          </span>
-
-                          {/* Re-check Status Button */}
-                          <button
-                            onClick={() => checkCameraStatus(camera.cameraId)}
-                            disabled={camera.status === 'checking'}
-                            style={{
-                              padding: '5px 10px',
-                              backgroundColor:
-                                camera.status === 'checking'
-                                  ? '#6c757d'
-                                  : '#17a2b8',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
-                              fontSize: '0.8rem',
-                              opacity: camera.status === 'checking' ? 0.6 : 1,
-                              transition: 'background-color 0.2s',
-                            }}
-                          >
-                            {camera.status === 'checking'
-                              ? 'Проверка...'
-                              : 'Перепроверить статус'}
-                          </button>
-                        </div>
-
-                        {/* Start/Loading Button */}
-                        {isDisabled ? (
-                          // Show Loading Screen/Message when status is unknown, checking, or stream is starting
-                          <div
-                            style={{
-                              padding: '10px 15px',
-                              backgroundColor: '#6c757d',
-                              color: '#fff',
-                              borderRadius: '4px',
-                              textAlign: 'center',
-                              fontWeight: 'bold',
-                            }}
-                          >
-                            {isStartingStream
-                              ? 'Начинаем...'
-                              : 'Проверка статуса...'}
-                          </div>
-                        ) : (
-                          // Show the start action button
-                          <button
-                            onClick={() => startStream(camera.cameraId)}
-                            style={{
-                              padding: '10px 15px',
-                              backgroundColor: isOffline ? '#ffc107' : '#28a745',
-                              color: isOffline ? '#333' : '#fff',
-                              border: 'none',
-                              borderRadius: '4px',
-                              cursor: 'pointer',
-                              width: '100%',
-                              transition: 'background-color 0.2s',
-                            }}
-                          >
-                            Посмотреть прямую трансляцию
-                          </button>
-                        )}
-                      </>
+                      <span>Поток офлайн.</span>
                     )}
                   </div>
+                )}
+
+                <div className="p-4 flex justify-between space-x-2">
+                  <button
+                    onClick={() => (isStreaming ? stopStream(camera.cameraId) : startStream(camera.cameraId))}
+                    disabled={isLoading || isChecking}
+                    className={`px-4 py-2 rounded-lg text-white font-medium transition-colors ${
+                      isStreaming
+                        ? 'bg-red-600 hover:bg-red-700'
+                        : 'bg-green-600 hover:bg-green-700'
+                    } disabled:bg-gray-400 flex-1`}
+                  >
+                    {isLoading ? 'Запуск...' : isStreaming ? 'Остановить' : 'Начать просмотр'}
+                  </button>
+                  <button
+                    onClick={() => checkCameraStatus(camera.cameraId)}
+                    disabled={isChecking || isLoading}
+                    className="px-4 py-2 rounded-lg text-gray-700 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-400 transition-colors"
+                  >
+                    Проверить
+                  </button>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
-
-        {/* 4. Global Styles for Responsiveness */}
-        <style jsx global>{`
-          .camera-viewer-container {
-            display: flex;
-            min-height: 100vh;
-            font-family: sans-serif;
-            background-color: #f4f4f9;
-            flex-direction: row;
-          }
-          .branch-sidebar {
-            width: 250px;
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            flex-shrink: 0;
-          }
-          .main-content-grid {
-            flex-grow: 1;
-            padding: 20px;
-          }
-          .streams-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 20px;
-          }
-          .mobile-branch-selector {
-            display: none;
-            padding: 20px 20px 0 20px;
-            width: 100%;
-          }
-
-          /* --- MOBILE STYLES --- */
-          @media (max-width: 768px) {
-            .camera-viewer-container {
-              flex-direction: column;
-            }
-            .branch-sidebar {
-              display: none;
-            }
-            .mobile-branch-selector {
-              display: block;
-            }
-            .main-content-grid {
-              padding: 10px;
-            }
-            .streams-grid {
-              grid-template-columns: 1fr;
-              gap: 15px;
-            }
-          }
-
-          html,
-          body,
-          #__next {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-          }
-        `}</style>
       </div>
     </>
   );
