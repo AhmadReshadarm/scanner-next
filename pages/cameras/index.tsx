@@ -16,6 +16,7 @@ interface HlsVideoPlayerProps {
 type CameraStatus = 'live' | 'offline' | 'checking' | 'unknown';
 
 // --- Data Fetching (Server-Side) ---
+// Loads the JSON data once at build time
 export async function getStaticProps() {
   const data = await import('../../data/streams.json');
   return {
@@ -35,27 +36,26 @@ const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [hasFatalError, setHasFatalError] = useState(false);
-  const [retryAttempt, setRetryAttempt] = useState(0); 
+  const [retryAttempt, setRetryAttempt] = useState(0); // Key state to trigger re-initialization
 
+  // Core function to initialize HLS
   const initializeHls = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    
-    console.log(`[HLS Player] Initializing HLS player for ${cameraId}. Attempt: ${retryAttempt}`);
 
+    // For Safari/Native HLS support
     if (!Hls.isSupported() && video.canPlayType('application/vnd.apple.mpegurl')) {
-        console.log(`[HLS Player] Using native HLS playback.`);
         video.src = hlsUrl;
         video.play();
         return;
     }
 
+    // Cleanup previous instance if it exists
     if (hlsRef.current) {
-      console.log(`[HLS Player] Destroying previous HLS instance.`);
       hlsRef.current.destroy();
     }
 
-    setHasFatalError(false); 
+    setHasFatalError(false); // Reset error state
     
     const hls = new Hls();
     hlsRef.current = hls;
@@ -64,54 +64,61 @@ const HlsVideoPlayer: React.FC<HlsVideoPlayerProps> = ({
     hls.attachMedia(video);
 
     let autoRetryCount = 0;
-    const MAX_AUTO_RETRIES = 5;
+    const MAX_AUTO_RETRIES = 5; // Automatic retries
 
     hls.on(Hls.Events.ERROR, (event, data) => {
       if (data.fatal) {
-        console.error(`[HLS Player ERROR] Fatal Error for ${cameraId}:`, data);
+        console.error(`HLS Fatal Error for ${cameraId}:`, data);
 
+        // Check for network errors related to manifest or fragment loading (common startup issue)
         if (
           (data.type === Hls.ErrorTypes.NETWORK_ERROR &&
            data.details === Hls.ErrorDetails.MANIFEST_LOAD_ERROR) ||
           (data.type === Hls.ErrorTypes.NETWORK_ERROR &&
            data.details === Hls.ErrorDetails.FRAG_LOAD_ERROR)
         ) {
+          // Automatic recovery attempt
           if (autoRetryCount < MAX_AUTO_RETRIES) {
             autoRetryCount++;
-            console.warn(
-              `[HLS Player Auto Retry] Attempting recovery for ${cameraId}. Attempt: ${autoRetryCount}`
+            console.log(
+              `[HLS.js Auto Retry] Attempting recovery for ${cameraId}. Attempt: ${autoRetryCount}`
             );
             hls.recoverMediaError();
           } else {
-            console.error(`[HLS Player Failure] Automatic retries exhausted. Showing manual retry.`);
+            // Automatic retries exhausted, set fatal error state to show manual button
+            console.error(`[HLS.js Failure] Automatic retries exhausted for ${cameraId}.`);
             hls.destroy();
             setHasFatalError(true); 
           }
         } else {
+          // Other fatal errors (e.g., decoding), destroy and show error
           hls.destroy();
           setHasFatalError(true);
         }
       }
     });
 
-  }, [hlsUrl, cameraId, retryAttempt]);
+  }, [hlsUrl, cameraId, retryAttempt]); // Dependency on retryAttempt forces re-init
 
+  // Effect to run initialization
   useEffect(() => {
     initializeHls();
 
     return () => {
       if (hlsRef.current) {
         hlsRef.current.destroy();
-        console.log(`[HLS Player] Cleanup: HLS instance destroyed.`);
       }
     };
   }, [initializeHls]);
 
+  // Manual Retry Handler
   const handleManualRetry = () => {
-    console.log(`[HLS Player Manual Retry] User initiating full stream re-initialization.`);
+    console.log(`[HLS.js Manual Retry] User initiating full stream re-initialization for ${cameraId}.`);
+    // Incrementing state forces the useEffect (via initializeHls dependency) to run again
     setRetryAttempt(prev => prev + 1); 
   };
   
+  // Render Logic
   return (
     <div
       style={{
@@ -169,6 +176,7 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
     Record<string, CameraStatus>
   >({});
 
+  // Use refs for latest state access in effects/intervals
   const cameraStatusesRef = useRef(cameraStatuses);
   const activeStreamsRef = useRef(activeStreams);
 
@@ -176,8 +184,8 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
   useEffect(() => { activeStreamsRef.current = activeStreams; }, [activeStreams]);
 
 
+  // Function to check the camera status via the API
   const checkCameraStatus = async (cameraId: string) => {
-    console.log(`[Frontend] Starting status check for ${cameraId}`);
     if (cameraStatusesRef.current[cameraId] === 'checking') return;
 
     setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'checking' }));
@@ -187,22 +195,18 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log(`[Frontend] Status check success for ${cameraId}: ${data.status}`);
         setCameraStatuses((prev) => ({ ...prev, [cameraId]: data.status }));
       } else {
-        console.error(`[Frontend] Status check failed (HTTP ${response.status}) for ${cameraId}`);
         setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'offline' }));
       }
     } catch (error) {
-      console.error(`[Frontend] Status check network error for ${cameraId}:`, error);
+      console.error('Error checking status:', error);
       setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'offline' }));
     }
   };
 
+  // Effect: Periodic and Staggered Status Checking
   useEffect(() => {
-    // ... (omitted: periodic check setup, logic remains the same)
-    // ... (use existing code from previous full response)
-    
     const currentBranchCameras = cameras[selectedBranch]?.links || [];
     const cameraIds = currentBranchCameras.map(
       (_, index) => `${selectedBranch}-${index}`,
@@ -220,7 +224,7 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
       setTimeout(() => staggerCheck(index + 1), 1500);
     };
 
-    // Reset and start check
+    // Reset statuses and clear active streams for the branch when switching
     setCameraStatuses({});
     setActiveStreams(prev => {
         const newActive = {...prev};
@@ -232,54 +236,53 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
 
     // --- 2. Periodic Re-check (The Ticker) ---
     const intervalId = setInterval(() => {
-      console.log('--- Frontend: Running periodic status re-check ---');
+      console.log('Running periodic status re-check...');
       cameraIds.forEach((cameraId) => {
         const status = cameraStatusesRef.current[cameraId];
         const isHlsActive = activeStreamsRef.current[cameraId];
 
+        // Only check if NOT active (HLS stream) and potentially offline
         if (!isHlsActive && (status === 'offline' || status === 'unknown')) {
           checkCameraStatus(cameraId);
         }
       });
-    }, 60000); 
+    }, 60000); // 60 seconds
 
     return () => clearInterval(intervalId);
   }, [selectedBranch, cameras]);
 
-
+  // Function to start the stream (INCLUDES 500ms RACE CONDITION FIX)
   const startStream = async (cameraId: string) => {
     if (activeStreams[cameraId] || loadingCameraId === cameraId) return;
 
-    console.log(`[Frontend START] Requesting stream start for ${cameraId}`);
     setLoadingCameraId(cameraId);
     setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'checking' }));
 
     try {
       const response = await fetch(`/api/stream/${cameraId}?action=start`);
+      const data = await response.json();
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log(`[Frontend START] API Success (200) for ${cameraId}. HLS URL: ${data.hlsUrl}`);
+      if (response.ok && data.hlsUrl) {
         
+        // 1. Update status to live immediately
         setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'live' }));
 
-        // CRITICAL FIX: Add a short delay (500ms)
-        console.log(`[Frontend START] Waiting 500ms for FFmpeg/Nginx stabilization.`);
+        // 2. *** CRITICAL FIX: Add a short delay (500ms) ***
+        // This mitigates the front-end fetch race condition by giving FFmpeg/Nginx
+        // a moment to stabilize the first HLS manifest file.
         await new Promise(resolve => setTimeout(resolve, 500)); 
         
+        // 3. Finally, activate the HLS player by setting the stream URL
         setActiveStreams((prev) => ({ ...prev, [cameraId]: data.hlsUrl }));
 
       } else {
-        // Handle 503 case here
-        const errorText = await response.text();
-        console.error(`[Frontend START] API Failed (HTTP ${response.status}) for ${cameraId}. Response: ${errorText}`);
         alert(
-          `Не удалось запустить поток (Ошибка: ${response.status}). Проверьте логи сервера.`
+          `Не удалось запустить поток: ${data.error || 'Неизвестная ошибка'}`,
         );
         setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'offline' }));
       }
     } catch (error) {
-      console.error('[Frontend START] Network/Fetch Error:', error);
+      console.error('Error starting stream:', error);
       alert('Произошла ошибка при подключении к потоковому серверу.');
       setCameraStatuses((prev) => ({ ...prev, [cameraId]: 'offline' }));
     } finally {
@@ -288,30 +291,27 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
   };
 
   const stopStream = async (cameraId: string) => {
-    console.log(`[Frontend STOP] Requesting stream stop for ${cameraId}`);
     try {
       const response = await fetch(`/api/stream/${cameraId}?action=stop`);
       if (response.ok) {
-        console.log(`[Frontend STOP] Stop request success for ${cameraId}.`);
         setActiveStreams((prev) => {
           const { [cameraId]: _, ...rest } = prev;
           return rest;
         });
+        // Re-check status immediately after stopping the stream
         checkCameraStatus(cameraId);
       } else {
-        console.error(`[Frontend STOP] Stop request failed (HTTP ${response.status}) for ${cameraId}.`);
         alert('Не удалось остановить поток.');
       }
     } catch (error) {
-      console.error('[Frontend STOP] Network/Fetch Error:', error);
+      console.error('Error stopping stream:', error);
     }
   };
 
-  // ... (omitted: allCameras, getStatusDisplay, and JSX render code, as they were correct)
-  
+  // Flattened camera data for rendering
   const allCameras =
     cameras[selectedBranch]?.links.map((link, linkIndex) => {
-      const cameraId = `${selectedBranch}-${linkIndex}`; 
+      const cameraId = `${selectedBranch}-${linkIndex}`; // Unique ID for API
       return {
         name: `Камера ${linkIndex + 1}`,
         cameraId,
@@ -324,17 +324,23 @@ const CameraViewerPage: React.FC<{ cameras: Camera[] }> = ({ cameras }) => {
     switch (status) {
       case 'live':
         return (
-          <span style={{ color: '#28a745', fontWeight: 'bold' }}>Онлайн (Live)</span>
+          <span style={{ color: '#28a745', fontWeight: 'bold' }}>
+            Онлайн (Live)
+          </span>
         );
       case 'offline':
         return (
-          <span style={{ color: '#dc3545', fontWeight: 'bold' }}>Офлайн (Offline)</span>
+          <span style={{ color: '#dc3545', fontWeight: 'bold' }}>
+            Офлайн (Offline)
+          </span>
         );
       case 'checking':
         return (
-          <span style={{ color: '#ffc107', fontWeight: 'bold' }}>Проверка...</span>
+          <span style={{ color: '#ffc107', fontWeight: 'bold' }}>
+            Проверка...
+          </span>
         );
-      default: 
+      default: // 'unknown'
         return <span style={{ color: '#6c757d' }}>Неизвестно</span>;
     }
   };
