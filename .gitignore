@@ -38,6 +38,10 @@ robots.txt
 
 # misalience
 /public/hls/*
+/public/hls/24-0/*
+/public/hls/24-1/*
+
+
 
 #cache
 /webprojnpm-cache
