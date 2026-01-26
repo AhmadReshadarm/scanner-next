@@ -24,10 +24,10 @@ const CardsSpecial = ({ data }) => {
               value={`${data.qrCode}`}
             />
           </div>
-          <p className={styles.qrCodeNumber}>
+          {/* <p className={styles.qrCodeNumber}>
             Wakavaping.com/ <br />
             pages/verify
-          </p>
+          </p> */}
         </div>
         <div className={styles.barcodNumberWrapper}>
           <p>
