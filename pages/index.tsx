@@ -12,7 +12,7 @@ import { clearTags, fetchTags } from 'redux/slicers/tagsSlicer';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ScannerResponse } from 'swagger/services';
 import ExcelJs from 'exceljs';
-import CodeGenerator from 'components/store/homePage/Codegenerator';
+import CodeGenerator from 'components/store/homePage/CodeGenerator';
 
 // ---------------------------------------------------------------------------------------
 const IndexPage = () => {
