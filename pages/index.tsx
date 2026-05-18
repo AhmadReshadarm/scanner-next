@@ -12,6 +12,7 @@ import { clearTags, fetchTags } from 'redux/slicers/tagsSlicer';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { ScannerResponse } from 'swagger/services';
 import ExcelJs from 'exceljs';
+import CodeGenerator from 'components/store/homePage/Codegenerator';
 
 // ---------------------------------------------------------------------------------------
 const IndexPage = () => {
@@ -97,7 +98,7 @@ const IndexPage = () => {
     setLoadingData(true);
     dispatch(
       fetchScanners({
-        limit: 100000,
+        limit: 100000000,
         offset: 0,
         tags: [selectedDatabaseURL],
       }),
@@ -225,6 +226,7 @@ const IndexPage = () => {
                 ? `Загрузка ${loadingProgress}%`
                 : 'Скачать все как Excel'}
             </button>
+            <CodeGenerator />
             <div className={styles.options_container}>
               <h1>выберите базу данных</h1>
               <select
