@@ -55,7 +55,7 @@ const CodeGenerator: React.FC = () => {
     try {
       const response: ScannerResponse = await dispatch(
         fetchScanners({
-          limit: 1000000,
+          limit: 100000000,
           offset: 0,
           tags: [tagUrl],
         }),
@@ -186,7 +186,7 @@ const CodeGenerator: React.FC = () => {
           <span>Количество: </span>
           <InputNumber
             min={1}
-            max={1000000}
+            max={100000000}
             value={amount}
             onChange={(val) => setAmount(val || 1)}
             disabled={generating}
