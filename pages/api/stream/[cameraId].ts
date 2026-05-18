@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import ffmpeg, { FfmpegCommand } from 'fluent-ffmpeg'; // Import FfmpegCommand type
+import ffmpeg, { FfmpegCommand } from 'fluent-ffmpeg';
 import path from 'path';
 import fs from 'fs';
+import os from 'os'; // <--- IMPORTED
 import { ChildProcess } from 'child_process';
 
 import streamData from '../../../data/streams.json';
@@ -15,12 +16,19 @@ interface StreamData {
 // Type assertion for mock data
 const streams: StreamData[] = streamData as any;
 
-// FIX: activeStreams now stores the FfmpegCommand object itself.
-// This object manages the internal ChildProcess and exposes the .kill() method.
 const activeStreams = new Map<string, FfmpegCommand>();
 
 // Global Constants for Restart Logic
 const MAX_RESTARTS = 3;
+
+// --- NEW: Define a stable HLS directory in the OS temp folder ---
+const HLS_BASE_DIR = path.join(os.tmpdir(), 'hls-streams');
+
+// Ensure this base directory exists when the server starts
+if (!fs.existsSync(HLS_BASE_DIR)) {
+  fs.mkdirSync(HLS_BASE_DIR, { recursive: true });
+  console.log(`[HLS] Created temporary stream directory at: ${HLS_BASE_DIR}`);
+}
 
 /**
  * Helper function to wait for a file to exist on the filesystem.
@@ -158,9 +166,12 @@ async function checkFfmpegStatus(
 ): Promise<boolean> {
   // Keep timeout at 10s, but use aggressive analysis parameters for reliability
   const checkTimeoutMs = 10000;
+  
+  // --- MODIFIED: Use HLS_BASE_DIR for checks ---
   const tempDir = path
-    .join(process.cwd(), 'public', 'hls', `check-${cameraId}`)
+    .join(HLS_BASE_DIR, `check-${cameraId}`)
     .replace(/\\/g, '/');
+    
   const tempManifestPath = path.join(tempDir, 'index.m3u8').replace(/\\/g, '/');
 
   // Ensure initial cleanup
@@ -260,9 +271,11 @@ export default async function streamHandler(
     action: string;
   };
 
+  // --- MODIFIED: Use HLS_BASE_DIR ---
   const streamDir = path
-    .join(process.cwd(), 'public', 'hls', cameraId)
+    .join(HLS_BASE_DIR, cameraId)
     .replace(/\\/g, '/');
+  
   const manifestPath = path.join(streamDir, 'index.m3u8').replace(/\\/g, '/');
 
   const rtspUrl = findRTSPUrl(cameraId);
@@ -309,7 +322,8 @@ export default async function streamHandler(
   if (action === 'start') {
     if (activeStreams.has(cameraId)) {
       if (fs.existsSync(manifestPath)) {
-        return res.status(200).json({ hlsUrl: `/hls/${cameraId}/index.m3u8` });
+        // --- MODIFIED: Return API URL ---
+        return res.status(200).json({ hlsUrl: `/api/hls/${cameraId}/index.m3u8` });
       } else {
         // The stream exists in the map but the file is missing -> restart it
         activeStreams.get(cameraId)!.kill('SIGKILL');
@@ -322,9 +336,10 @@ export default async function streamHandler(
     const manifestCreated = await waitForFile(manifestPath, 20000);
 
     if (manifestCreated) {
+      // --- MODIFIED: Return API URL ---
       return res.status(200).json({
         status: 'Stream initiated and manifest ready.',
-        hlsUrl: `/hls/${cameraId}/index.m3u8`,
+        hlsUrl: `/api/hls/${cameraId}/index.m3u8`,
       });
     } else {
       console.error(
