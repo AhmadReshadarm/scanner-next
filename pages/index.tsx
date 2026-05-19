@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { fetchScanners, removeScanner } from 'redux/slicers/scannerSlicer';
+import {
+  fetchScanners,
+  fetchScannersForExecl,
+  removeScanner,
+} from 'redux/slicers/scannerSlicer';
 import { TScanner } from 'redux/types';
 import styles from '../components/store/homePage/styles/main.module.css';
 import CodeDecoder from 'components/store/homePage/CodeDecoder';
-import { Button, Modal } from 'antd';
+import { Button, Modal, InputNumber, Progress } from 'antd';
 import Pagination from 'antd/es/pagination';
 import { DeleteOutlined } from '@ant-design/icons';
 import { AppDispatch } from 'redux/store';
@@ -17,7 +21,6 @@ import CodeGenerator from 'components/store/homePage/CodeGenerator';
 // ---------------------------------------------------------------------------------------
 const IndexPage = () => {
   const [isClient, setClient] = useState(false);
-
   const dispatch = useAppDispatch();
   const { scanners, length, loading } = useAppSelector<TScanner>(
     (state) => state.scanner,
@@ -25,6 +28,20 @@ const IndexPage = () => {
   const tags = useAppSelector((state) => state.tags.tags);
   const [selectedDatabase, setSelectedDatabase] = useState('');
   const [selectedDatabaseURL, setSelectedDatabaseURL] = useState('');
+
+  // ----- Excel batch download states -----
+  const [batchSize, setBatchSize] = useState<number>(50000);
+  const [totalRecords, setTotalRecords] = useState<number | null>(null);
+  const [downloadedBatches, setDownloadedBatches] = useState<Set<number>>(
+    new Set(),
+  );
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0); // 0–100
+
+  // Workbook ref to accumulate rows across batches
+  const workbookRef = useRef<ExcelJs.Workbook | null>(null);
+  const sheetRef = useRef<ExcelJs.Worksheet | null>(null);
+
   useEffect(() => {
     dispatch(fetchTags({ limit: '10000', offset: '0', orderBy: 'ASC' }));
     setClient(true);
@@ -46,6 +63,19 @@ const IndexPage = () => {
       );
     }
   }, [tags]);
+
+  // Reset download state when database changes
+  useEffect(() => {
+    resetDownloadState();
+  }, [selectedDatabaseURL]);
+
+  const resetDownloadState = () => {
+    setTotalRecords(null);
+    setDownloadedBatches(new Set());
+    setDownloadProgress(0);
+    workbookRef.current = null;
+    sheetRef.current = null;
+  };
 
   const [visible, setVisible] = useState(false);
   const showOrDontModal = () => {
@@ -88,100 +118,129 @@ const IndexPage = () => {
   const dummy = [1, 2, 3, 4, 5, 6, 7, 8];
 
   // -----------------------------------------------------------------------------------
-
-  const handleProductDownloadInExcel = (
-    dispatch,
-    setLoadingData,
-    ExcelJs,
-    seLoadingProgress,
-  ) => {
-    setLoadingData(true);
-    dispatch(
-      fetchScanners({
-        limit: 100000000,
+  const fetchTotalCount = async (): Promise<number> => {
+    const response: ScannerResponse = await dispatch(
+      fetchScannersForExecl({
+        limit: 1,
         offset: 0,
         tags: [selectedDatabaseURL],
       }),
-    )
-      .then(unwrapResult)
-      .then((response: ScannerResponse) => {
-        setLoadingData(true);
-        if (!response.rows || !Array.isArray(response.rows)) {
-          console.error(
-            'Error: Products data is missing or not in the expected format.',
-            response,
-          );
-          return; // Exit the function to prevent further errors
-        }
+    ).then(unwrapResult);
+    return response.length ?? 0;
+  };
 
-        let workBook = new ExcelJs.Workbook();
-        const sheet = workBook.addWorksheet('subscribers');
-        sheet.columns = [
-          { header: 'ID', key: 'id', width: 20 },
-          { header: 'QR-код', key: 'qrCode', width: 100 },
-          { header: 'Штрих-код', key: 'barCode', width: 40 },
-        ];
-        sheet.getRow(1).alignment = {
-          vertical: 'middle',
-          horizontal: 'center',
-          wrapText: true,
-        };
-        // sheet.properties.defaultRowHeight = 115;
-        // console.log(response);
-        // setLoadingData(false);
-        // return;
-        let counter = 0;
-        let progress = 0;
-        const productIteration = async () => {
-          if (counter < response.rows!.length) {
-            progress = Math.floor((counter * 100) / response.rows!.length);
-            seLoadingProgress(progress);
+  const handleStartDownload = async () => {
+    if (!selectedDatabaseURL) return;
 
-            await sheet.addRow({
-              id: response.rows![counter]?.id,
-              qrCode: response.rows![counter]?.qrCode,
-              barCode: response.rows![counter]?.barCode,
+    // Reset workbook and sheet for a fresh download
+    const workbook = new ExcelJs.Workbook();
+    const sheet = workbook.addWorksheet('subscribers');
+    sheet.columns = [
+      { header: 'ID', key: 'id', width: 20 },
+      { header: 'QR-код', key: 'qrCode', width: 100 },
+      { header: 'Штрих-код', key: 'barCode', width: 40 },
+    ];
+    sheet.getRow(1).alignment = {
+      vertical: 'middle',
+      horizontal: 'center',
+      wrapText: true,
+    };
+    workbookRef.current = workbook;
+    sheetRef.current = sheet;
+
+    setIsDownloading(true);
+    setDownloadProgress(0);
+    setDownloadedBatches(new Set());
+
+    // Fetch total records if not already known
+    let total = totalRecords;
+    if (total === null) {
+      total = await fetchTotalCount();
+      setTotalRecords(total);
+    }
+
+    if (total === 0) {
+      setIsDownloading(false);
+      return;
+    }
+
+    const effectiveBatchSize = Math.min(batchSize, 50000);
+    const totalBatches = Math.ceil(total / effectiveBatchSize);
+    let completedBatches = 0;
+
+    // Process each batch sequentially
+    for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
+      const offset = batchIndex * effectiveBatchSize;
+      // Skip already downloaded batches (if resuming after reset)
+      if (downloadedBatches.has(offset)) {
+        completedBatches++;
+        setDownloadProgress(
+          Math.floor((completedBatches / totalBatches) * 100),
+        );
+        continue;
+      }
+
+      const response: ScannerResponse = await dispatch(
+        fetchScannersForExecl({
+          limit: effectiveBatchSize,
+          offset,
+          tags: [selectedDatabaseURL],
+        }),
+      ).then(unwrapResult);
+
+      if (response.rows && Array.isArray(response.rows)) {
+        // Add rows in chunk to keep UI responsive
+        const CHUNK_SIZE = 500;
+        for (let i = 0; i < response.rows.length; i += CHUNK_SIZE) {
+          const chunk = response.rows.slice(i, i + CHUNK_SIZE);
+          for (const row of chunk) {
+            sheet.addRow({
+              id: row.id,
+              qrCode: row.qrCode,
+              barCode: row.barCode,
             });
             sheet.getRow(sheet.rowCount).alignment = {
               vertical: 'middle',
               horizontal: 'center',
               wrapText: true,
             };
-
-            counter = counter + 1;
-            productIteration();
-          } else {
-            try {
-              workBook.xlsx.writeBuffer().then((data) => {
-                const blob = new Blob([data], {
-                  type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                });
-                const url = window.URL.createObjectURL(blob);
-                const anchor = document.createElement('a');
-                anchor.href = url;
-                anchor.download = `${
-                  new Date().toISOString().split('T')[0]
-                }.xlsx`;
-                anchor.click();
-                window.URL.revokeObjectURL(url);
-              });
-              seLoadingProgress(100);
-              setLoadingData(false);
-              seLoadingProgress(0);
-            } catch (error) {
-              console.log(error);
-            }
           }
-        };
-        productIteration();
-      })
-      .catch((error) => {
-        console.log(error);
+          // Yield to UI thread
+          await new Promise((resolve) => setTimeout(resolve, 0));
+        }
+      }
+
+      // Mark this batch as downloaded
+      setDownloadedBatches((prev) => new Set(prev).add(offset));
+      completedBatches++;
+      setDownloadProgress(Math.floor((completedBatches / totalBatches) * 100));
+    }
+
+    // All batches processed – generate file and trigger download
+    if (workbookRef.current) {
+      const buffer = await workbookRef.current.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
+      const url = window.URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = `${new Date().toISOString().split('T')[0]}.xlsx`;
+      anchor.click();
+      window.URL.revokeObjectURL(url);
+    }
+
+    setIsDownloading(false);
+    setDownloadProgress(100);
   };
 
-  const [loadingProgress, seLoadingProgress] = useState(0);
-  const [loadingData, setLoadingData] = useState(false);
+  const handleResetDownload = () => {
+    resetDownloadState();
+  };
+
+  const totalBatches = totalRecords
+    ? Math.ceil(totalRecords / Math.min(batchSize, 50000))
+    : 0;
 
   // ----------------------------------------------------------------------------------------
 
@@ -212,20 +271,73 @@ const IndexPage = () => {
             >
               Обновить данные
             </button>
-            <button
-              onClick={() =>
-                handleProductDownloadInExcel(
-                  dispatch,
-                  setLoadingData,
-                  ExcelJs,
-                  seLoadingProgress,
-                )
-              }
+
+            {/* ---------- Excel batch download UI ---------- */}
+            <div
+              style={{
+                margin: '20px 0',
+                padding: '15px',
+                border: '1px solid #d9d9d9',
+                borderRadius: '8px',
+              }}
             >
-              {loadingData
-                ? `Загрузка ${loadingProgress}%`
-                : 'Скачать все как Excel'}
-            </button>
+              <h3>Скачать все данные (Excel) пакетами</h3>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '15px',
+                  flexWrap: 'wrap',
+                  marginBottom: '10px',
+                }}
+              >
+                <span>Размер пакета (макс. 50000):</span>
+                <InputNumber
+                  min={1}
+                  max={50000}
+                  value={batchSize}
+                  onChange={(val) => setBatchSize(val || 50000)}
+                  disabled={isDownloading}
+                  style={{ width: 120 }}
+                />
+                <Button
+                  type="primary"
+                  onClick={handleStartDownload}
+                  loading={isDownloading}
+                  disabled={isDownloading || !selectedDatabaseURL}
+                >
+                  {isDownloading
+                    ? `Скачивание ${downloadProgress}%`
+                    : 'Начать скачивание'}
+                </Button>
+                <Button onClick={handleResetDownload} disabled={isDownloading}>
+                  Сбросить прогресс
+                </Button>
+              </div>
+
+              {totalRecords !== null && (
+                <div style={{ marginBottom: '10px' }}>
+                  <p>
+                    Всего записей: <strong>{totalRecords}</strong> | Пакетов:{' '}
+                    <strong>{totalBatches}</strong>
+                  </p>
+                  <p>
+                    Скачано пакетов: <strong>{downloadedBatches.size}</strong>{' '}
+                    из {totalBatches}
+                  </p>
+                </div>
+              )}
+
+              {isDownloading && (
+                <Progress
+                  percent={downloadProgress}
+                  status="active"
+                  style={{ marginTop: '10px' }}
+                />
+              )}
+            </div>
+            {/* ---------------------------------------------- */}
+
             <CodeGenerator />
             <div className={styles.options_container}>
               <h1>выберите базу данных</h1>
@@ -334,5 +446,4 @@ const IndexPage = () => {
   );
 };
 
-// IndexPage.PageLayout = StoreLayout;
 export default IndexPage;

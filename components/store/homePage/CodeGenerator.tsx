@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import { createScanner, fetchScanners } from 'redux/slicers/scannerSlicer';
 import { Button, InputNumber, Input, Checkbox, Progress, Select } from 'antd';
@@ -31,6 +31,9 @@ const CodeGenerator: React.FC = () => {
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
 
+  // Cache for existing QR codes per tag URL – survives re‑renders
+  const existingCodesCache = useRef<Map<string, Set<string>>>(new Map());
+
   // Build character set from current options
   const getCharacterSet = (): string => {
     let chars = '';
@@ -50,31 +53,44 @@ const CodeGenerator: React.FC = () => {
     return result;
   };
 
-  // Fetch existing QR codes (the full string we'll store in qrCode) for the tag
-  const fetchExistingQRCodes = async (tagUrl: string): Promise<Set<string>> => {
+  /**
+   * Fetches all existing QR codes for a given tag URL and caches them.
+   * If already cached, returns the cached set immediately.
+   */
+  const getExistingCodesForTag = async (
+    tagUrl: string,
+  ): Promise<Set<string>> => {
+    const cache = existingCodesCache.current;
+    if (cache.has(tagUrl)) {
+      return cache.get(tagUrl)!;
+    }
+
+    // Fetch from server (only once per tag)
     try {
       const response: ScannerResponse = await dispatch(
         fetchScanners({
-          limit: 100000000,
+          limit: 1000000,
           offset: 0,
           tags: [tagUrl],
         }),
       ).then(unwrapResult);
 
-      const existingCodes = new Set<string>();
+      const codes = new Set<string>();
       if (response.rows) {
         for (const scanner of response.rows) {
           if (scanner.qrCode) {
-            existingCodes.add(scanner.qrCode);
+            codes.add(scanner.qrCode);
           }
         }
       }
-      return existingCodes;
+      cache.set(tagUrl, codes);
+      return codes;
     } catch (error) {
       console.error(
-        'Failed to fetch existing QR codes, proceeding without check.',
+        'Failed to fetch existing codes, generating without duplicate check.',
         error,
       );
+      // Return empty set on failure, allowing generation (duplicates possible)
       return new Set<string>();
     }
   };
@@ -102,18 +118,18 @@ const CodeGenerator: React.FC = () => {
     setGenerating(true);
     setProgress(0);
 
-    // Fetch existing QR codes for this tag (so we avoid duplicates)
-    const existingQRCodes = await fetchExistingQRCodes(tagUrl);
+    // Retrieve (or fetch) the set of already existing codes for this tag
+    const existingCodes = await getExistingCodesForTag(tagUrl);
 
     const localGenerated = new Set<string>();
     const newEntries: { qrCode: string; barCode: string }[] = [];
 
     // Calculate maximum possible unique codes
     const maxPossible = Math.pow(charSet.length, length);
-    if (amount > maxPossible - existingQRCodes.size) {
+    if (amount > maxPossible - existingCodes.size) {
       alert(
         `Невозможно сгенерировать ${amount} уникальных кодов. ` +
-          `Доступное пространство: ${maxPossible}, уже существует: ${existingQRCodes.size}.`,
+          `Доступное пространство: ${maxPossible}, уже существует: ${existingCodes.size}.`,
       );
       setGenerating(false);
       return;
@@ -126,7 +142,7 @@ const CodeGenerator: React.FC = () => {
       const rawCode = generateRandomCode(charSet, length);
       const finalCode = hasPrefix ? prefix + rawCode : rawCode;
 
-      if (!existingQRCodes.has(finalCode) && !localGenerated.has(finalCode)) {
+      if (!existingCodes.has(finalCode) && !localGenerated.has(finalCode)) {
         localGenerated.add(finalCode);
         newEntries.push({ qrCode: finalCode, barCode: rawCode });
       }
@@ -140,18 +156,20 @@ const CodeGenerator: React.FC = () => {
       );
     }
 
-    // Save the new codes
+    // Save the new codes and update the cache
     for (let i = 0; i < newEntries.length; i++) {
       const { qrCode, barCode } = newEntries[i];
       const payload: any = {
         id: '',
-        qrCode: qrCode, // full code with prefix (if any)
-        barCode: barCode, // raw generated code without prefix
-        tags: [selectedTagId], // tag ID
+        qrCode,
+        barCode,
+        tags: [selectedTagId],
       };
 
       try {
         await dispatch(createScanner(payload));
+        // Only now add to the cache – on success
+        existingCodes.add(qrCode);
       } catch (error) {
         console.error('Ошибка при сохранении кода', qrCode, error);
       }
@@ -186,7 +204,7 @@ const CodeGenerator: React.FC = () => {
           <span>Количество: </span>
           <InputNumber
             min={1}
-            max={100000000}
+            max={1000000000000000}
             value={amount}
             onChange={(val) => setAmount(val || 1)}
             disabled={generating}

@@ -360,7 +360,9 @@ type TScanner = {
   scanners: Scanner[];
   length: number;
   loading: boolean;
+  loadingPost: boolean;
   updatingLoading: boolean;
+  loadingExcel: boolean;
 };
 
 type TProductReviewsState = {

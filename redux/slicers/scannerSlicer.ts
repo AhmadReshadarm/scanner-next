@@ -40,6 +40,22 @@ export const fetchScanners = createAsyncThunk<
   },
 );
 
+export const fetchScannersForExecl = createAsyncThunk<
+  { rows: Scanner[]; length: number },
+  TScannerPayload,
+  { rejectValue: string }
+>(
+  'scanner/fetchScannersForExecl',
+  async function (payload, { rejectWithValue }): Promise<any> {
+    try {
+      const response = await ScannerService.getScanners(payload);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(getErrorMassage(error.response.status));
+    }
+  },
+);
+
 export const updateScanner = createAsyncThunk<
   Scanner,
   Scanner,
@@ -81,6 +97,8 @@ const initialState: TScanner = {
   length: 0,
   loading: false,
   updatingLoading: false,
+  loadingPost: false,
+  loadingExcel: false,
 };
 
 const scannerSlicer = createSlice({
@@ -90,13 +108,15 @@ const scannerSlicer = createSlice({
   extraReducers: (builder) => {
     builder
       // createScanner
-      .addCase(createScanner.pending, handlePending)
+      .addCase(createScanner.pending, (state, action) => {
+        state.loadingPost = true;
+      })
       .addCase(createScanner.fulfilled, (state, action) => {
         state.scanner = action.payload;
         openSuccessNotification(
           `QR-код сохраняется с ID: ${action.payload.id}`,
         );
-        state.loading = false;
+        state.loadingPost = false;
       })
       .addCase(createScanner.rejected, handleError)
       //fetchScanners
@@ -110,11 +130,25 @@ const scannerSlicer = createSlice({
         state.loading = false;
         localStorage.removeItem('wishlistId');
       })
+      // fetchScannersForExecl
+      .addCase(fetchScannersForExecl.pending, (state, action) => {
+        state.loadingExcel = true;
+      })
+      .addCase(fetchScannersForExecl.fulfilled, (state, action) => {
+        state.scanners = action.payload.rows;
+        state.length = action.payload.length;
+        state.loadingExcel = false;
+      })
+      .addCase(fetchScannersForExecl.rejected, (state, action) => {
+        state.loadingExcel = false;
+      })
       //updateScanner
-      .addCase(updateScanner.pending, handlePending)
+      .addCase(updateScanner.pending, (state, action) => {
+        state.updatingLoading = true;
+      })
       .addCase(updateScanner.fulfilled, (state, action) => {
         state.scanner = action.payload;
-        state.loading = false;
+        state.updatingLoading = false;
       })
       .addCase(updateScanner.rejected, handleError)
       //removeScanner
